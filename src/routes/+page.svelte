@@ -34,7 +34,7 @@
 
 <main>
 	<header>
-		<h1>📻 HAM Radio Dashboard</h1>
+		<h1>Rochester HAM Radio Dashboard</h1>
 		<p class="location">Rochester, MN</p>
 	</header>
 
