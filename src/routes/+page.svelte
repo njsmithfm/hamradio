@@ -1,17 +1,22 @@
 <script>
 	import { onMount } from 'svelte';
+	import KIndexChart from '$lib/KIndexChart.svelte';
 
-	let kIndex = null;
-	let weather = null;
+	let kIndexData = [];
+	let currentKIndex = null;
 	let loading = true;
 
 	onMount(async () => {
-		// Fetch K-index
-		const kResponse = await fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json');
-		const kData = await kResponse.json();
-		kIndex = kData[kData.length - 1].kp_index;
-
-		loading = false;
+		try {
+			// Fetch K-index data
+			const response = await fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json');
+			kIndexData = await response.json();
+			currentKIndex = kIndexData[kIndexData.length - 1].kp_index;
+		} catch (error) {
+			console.error('Error fetching data:', error);
+		} finally {
+			loading = false;
+		}
 	});
 </script>
 
@@ -20,12 +25,26 @@
 
 	{#if loading}
 		<p>Loading conditions...</p>
-	{:else}
-		<div class="metric">
-			<h2>K-Index</h2>
-			<p class="value">{kIndex}</p>
-			<p class="status">{kIndex <= 3 ? 'Good' : 'Poor'} conditions</p>
+	{:else if kIndexData.length > 0}
+		<div class="metric-card">
+			<h2>Current K-Index: <span class="value">{currentKIndex}</span></h2>
+			<p class="status">
+				{#if currentKIndex <= 3}
+					✅ Excellent conditions for HF propagation
+				{:else if currentKIndex <= 5}
+					⚠️ Fair conditions
+				{:else}
+					❌ Poor conditions - geomagnetic storm in progress
+				{/if}
+			</p>
 		</div>
+
+		<div class="chart-card">
+			<h2>K-Index Trend (Last 24 Hours)</h2>
+			<KIndexChart data={kIndexData} />
+		</div>
+	{:else}
+		<p>Unable to load data</p>
 	{/if}
 </main>
 
@@ -34,18 +53,34 @@
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 2rem;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
 	}
 
-	.metric {
-		background: #f0f0f0;
+	h1 {
+		color: #1e40af;
+		margin-bottom: 2rem;
+	}
+
+	.metric-card,
+	.chart-card {
+		background: white;
 		padding: 1.5rem;
 		border-radius: 8px;
-		margin: 1rem 0;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		margin-bottom: 1.5rem;
 	}
 
 	.value {
-		font-size: 3rem;
+		font-size: 2rem;
 		font-weight: bold;
-		margin: 0.5rem 0;
+		color: #2563eb;
+	}
+
+	.status {
+		font-size: 1.1rem;
+		margin-top: 0.5rem;
 	}
 </style>
