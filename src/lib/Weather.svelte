@@ -1,4 +1,3 @@
-<!-- src/lib/Weather.svelte -->
 <script>
 	import { onMount } from 'svelte';
 

@@ -1,4 +1,3 @@
-<!-- src/lib/Bands.svelte -->
 <script>
 	export let solarFlux = 0;
 	export let kIndex = 0;

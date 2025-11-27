@@ -1,4 +1,3 @@
-<!-- src/routes/+page.svelte -->
 <script>
 	import { onMount } from 'svelte';
 	import KIndex from '$lib/KIndex.svelte';
