@@ -2,19 +2,29 @@
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
 
-	export let data = []; // Array of {time, kp_index} objects
+	export let data = [];
 
 	let chartContainer;
+	let debugInfo = '';
 
 	onMount(() => {
-		if (data.length === 0) return;
+		console.log('Chart mounting...');
+		console.log('Raw data received:', data);
+		console.log('Data length:', data.length);
 
-		// Set up dimensions
-		const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+		if (data.length === 0) {
+			debugInfo = 'No data received';
+			return;
+		}
+
+		// Check what the first item looks like
+		console.log('First data item:', data[0]);
+		console.log('time_tag format:', data[0].time_tag);
+
+		const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 		const width = 600 - margin.left - margin.right;
 		const height = 300 - margin.top - margin.bottom;
 
-		// Create SVG
 		const svg = d3
 			.select(chartContainer)
 			.append('svg')
@@ -23,38 +33,58 @@
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		// Parse time and prepare data (last 24 readings)
-		const parseTime = d3.timeParse('%Y-%m-%d %H:%M:%S');
-		const recentData = data.slice(-24).map((d) => ({
-			time: parseTime(d.time_tag),
-			value: +d.kp_index
-		}));
+		// Try parsing the time - this is where it usually breaks
+		const parseTime = (str) => new Date(str);
+
+		// Take last 24 and prepare data
+		const recentData = data.slice(-24).map((d) => {
+			const parsedTime = parseTime(d.time_tag);
+			console.log('Parsing:', d.time_tag, '→', parsedTime); // DEBUG LINE
+
+			return {
+				time: parsedTime,
+				value: +d.kp_index,
+				originalTime: d.time_tag // Keep original for debugging
+			};
+		});
+
+		// Check if any times are null
+		const nullTimes = recentData.filter((d) => d.time === null);
+		if (nullTimes.length > 0) {
+			debugInfo = `ERROR: ${nullTimes.length} dates failed to parse!`;
+			console.error('Failed to parse these dates:', nullTimes);
+			return;
+		}
+
+		console.log('Processed data:', recentData);
 
 		// Set up scales
-		const x = d3
-			.scaleTime()
-			.domain(d3.extent(recentData, (d) => d.time))
-			.range([0, width]);
+		const xExtent = d3.extent(recentData, (d) => d.time);
+		console.log('X extent (time range):', xExtent);
 
-		const y = d3
-			.scaleLinear()
-			.domain([0, 9]) // K-index ranges 0-9
-			.range([height, 0]);
+		const x = d3.scaleTime().domain(xExtent).range([0, width]);
 
-		// Color scale (green = good, red = bad)
-		const color = d3.scaleLinear().domain([0, 5, 9]).range(['#00ff00', '#ffff00', '#ff0000']);
+		const y = d3.scaleLinear().domain([0, 9]).range([height, 0]);
 
-		// Add X axis
+		// Test the scales
+		console.log('First point maps to:', {
+			x: x(recentData[0].time),
+			y: y(recentData[0].value)
+		});
+
+		// Add axes
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${height})`)
 			.call(d3.axisBottom(x).ticks(6))
-			.style('font-size', '12px');
+			.selectAll('text')
+			.style('font-size', '12px')
+			.attr('transform', 'rotate(-45)')
+			.style('text-anchor', 'end');
 
-		// Add Y axis
 		svg.append('g').call(d3.axisLeft(y)).style('font-size', '12px');
 
-		// Add Y axis label
+		// Y axis label
 		svg
 			.append('text')
 			.attr('transform', 'rotate(-90)')
@@ -79,45 +109,30 @@
 			.attr('stroke-width', 2)
 			.attr('d', line);
 
-		// Add dots with color coding
+		// Add dots
 		svg
 			.selectAll('circle')
 			.data(recentData)
 			.enter()
 			.append('circle')
-			.attr('cx', (d) => x(d.time))
+			.attr('cx', (d) => {
+				const xPos = x(d.time);
+				console.log('Circle at time', d.time, '→ x =', xPos); // DEBUG
+				return xPos;
+			})
 			.attr('cy', (d) => y(d.value))
 			.attr('r', 4)
-			.attr('fill', (d) => color(d.value))
-			.attr('stroke', '#333')
+			.attr('fill', '#2563eb')
+			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
-		// Add reference line at K=4 (when conditions start degrading)
-		svg
-			.append('line')
-			.attr('x1', 0)
-			.attr('x2', width)
-			.attr('y1', y(4))
-			.attr('y2', y(4))
-			.attr('stroke', 'red')
-			.attr('stroke-dasharray', '5,5')
-			.attr('opacity', 0.5);
-
-		svg
-			.append('text')
-			.attr('x', width - 5)
-			.attr('y', y(4) - 5)
-			.attr('text-anchor', 'end')
-			.style('font-size', '11px')
-			.style('fill', 'red')
-			.text('Poor conditions threshold');
+		debugInfo = `Chart rendered with ${recentData.length} points`;
 	});
 </script>
 
-<div bind:this={chartContainer}></div>
-
-<style>
-	div {
-		margin: 1rem 0;
-	}
-</style>
+<div>
+	{#if debugInfo}
+		<p style="color: red; font-weight: bold;">{debugInfo}</p>
+	{/if}
+	<div bind:this={chartContainer}></div>
+</div>

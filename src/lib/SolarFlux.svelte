@@ -1,3 +1,4 @@
+<!-- src/lib/SolarFluxChart.svelte -->
 <script>
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
@@ -5,11 +6,26 @@
 	export let data = [];
 
 	let chartContainer;
+	let debugInfo = '';
 
 	onMount(() => {
-		if (data.length === 0) return;
+		console.log('=== SOLAR FLUX CHART DEBUG ===');
+		console.log('Raw data received:', data);
+		console.log('Data length:', data.length);
 
-		const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+		if (data.length === 0) {
+			debugInfo = 'No data received';
+			return;
+		}
+
+		// Check what the data looks like
+		console.log('First item:', data[0]);
+		console.log('Last item:', data[data.length - 1]);
+
+		// Check what fields exist
+		console.log('Available fields:', Object.keys(data[0]));
+
+		const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 		const width = 600 - margin.left - margin.right;
 		const height = 250 - margin.top - margin.bottom;
 
@@ -21,30 +37,69 @@
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		// Parse and prepare data (last 30 days)
-		const parseTime = d3.timeParse('%Y-%m-%d %H:%M:%S');
-		const recentData = data.slice(-30).map((d) => ({
-			time: parseTime(d.time_tag),
-			flux: +d.flux
-		}));
+		// Parse time - CHECK THE FORMAT
+		const parseTime = (str) => new Date(str);
+
+		// Get last 30 days and prepare
+		const recentData = data.slice(-30).map((d) => {
+			const parsedTime = parseTime(d.time_tag);
+			console.log('Parsing:', d.time_tag, '→', parsedTime);
+
+			return {
+				time: parsedTime,
+				flux: +d.flux,
+				originalTime: d.time_tag
+			};
+		});
+
+		// Check for parsing failures
+		const nullTimes = recentData.filter((d) => d.time === null);
+		const invalidFlux = recentData.filter((d) => isNaN(d.flux));
+
+		if (nullTimes.length > 0) {
+			debugInfo = `ERROR: ${nullTimes.length} dates failed to parse`;
+			console.error('Failed dates:', nullTimes);
+			return;
+		}
+
+		if (invalidFlux.length > 0) {
+			debugInfo = `ERROR: ${invalidFlux.length} flux values are not numbers`;
+			console.error('Invalid flux:', invalidFlux);
+			return;
+		}
+
+		console.log('Processed data (first 3):', recentData.slice(0, 3));
 
 		// Scales
-		const x = d3
-			.scaleTime()
-			.domain(d3.extent(recentData, (d) => d.time))
-			.range([0, width]);
+		const xExtent = d3.extent(recentData, (d) => d.time);
+		const yExtent = d3.extent(recentData, (d) => d.flux);
+
+		console.log('X extent (time):', xExtent);
+		console.log('Y extent (flux):', yExtent);
+
+		const x = d3.scaleTime().domain(xExtent).range([0, width]);
 
 		const y = d3
 			.scaleLinear()
 			.domain([0, d3.max(recentData, (d) => d.flux) * 1.1])
 			.range([height, 0]);
 
+		// Test scale output
+		console.log('First point maps to:', {
+			x: x(recentData[0].time),
+			y: y(recentData[0].flux),
+			flux: recentData[0].flux
+		});
+
 		// Axes
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${height})`)
 			.call(d3.axisBottom(x).ticks(5))
-			.style('font-size', '12px');
+			.selectAll('text')
+			.style('font-size', '12px')
+			.attr('transform', 'rotate(-45)')
+			.style('text-anchor', 'end');
 
 		svg.append('g').call(d3.axisLeft(y)).style('font-size', '12px');
 
@@ -57,7 +112,7 @@
 			.style('text-anchor', 'middle')
 			.text('Solar Flux (SFU)');
 
-		// Area under the line
+		// Area
 		const area = d3
 			.area()
 			.x((d) => x(d.time))
@@ -70,8 +125,14 @@
 		// Line
 		const line = d3
 			.line()
-			.x((d) => x(d.time))
-			.y((d) => y(d.flux))
+			.x((d) => {
+				const xPos = x(d.time);
+				return xPos;
+			})
+			.y((d) => {
+				const yPos = y(d.flux);
+				return yPos;
+			})
 			.curve(d3.curveMonotoneX);
 
 		svg
@@ -82,27 +143,15 @@
 			.attr('stroke-width', 2)
 			.attr('d', line);
 
-		// Reference lines for band conditions
-		// 70+ = Good, 150+ = Excellent
-		svg
-			.append('line')
-			.attr('x1', 0)
-			.attr('x2', width)
-			.attr('y1', y(150))
-			.attr('y2', y(150))
-			.attr('stroke', 'green')
-			.attr('stroke-dasharray', '5,5')
-			.attr('opacity', 0.5);
-
-		svg
-			.append('text')
-			.attr('x', width - 5)
-			.attr('y', y(150) - 5)
-			.attr('text-anchor', 'end')
-			.style('font-size', '11px')
-			.style('fill', 'green')
-			.text('Excellent (150+)');
+		debugInfo = `Chart rendered with ${recentData.length} points. Flux range: ${yExtent[0].toFixed(1)} - ${yExtent[1].toFixed(1)}`;
 	});
 </script>
 
-<div bind:this={chartContainer}></div>
+<div>
+	{#if debugInfo}
+		<p style="padding: 0.5rem; background: #fef3c7; border-left: 4px solid #f59e0b;">
+			{debugInfo}
+		</p>
+	{/if}
+	<div bind:this={chartContainer}></div>
+</div>
