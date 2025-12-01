@@ -6,6 +6,7 @@
 
 	let chartContainer;
 	let debugInfo = '';
+	let tooltip;
 
 	onMount(() => {
 		console.log('Chart mounting...');
@@ -72,6 +73,8 @@
 			y: y(recentData[0].value)
 		});
 
+		//
+
 		// Add axes
 		svg
 			.append('g')
@@ -110,7 +113,7 @@
 			.attr('d', line);
 
 		// Add dots
-		svg
+		const circles = svg
 			.selectAll('circle')
 			.data(recentData)
 			.enter()
@@ -126,6 +129,26 @@
 			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
+		circles
+			.on('mouseover', (event, d) => {
+				// Populate tooltip HTML – customize to your needs
+				const html = `
+        
+        K‑Index: <span >${d.value}</span>
+      `;
+				tooltip.innerHTML = html;
+				tooltip.style.opacity = 1; // fade‑in
+			})
+			.on('mousemove', (event) => {
+				// `event.pageX/Y` are relative to the whole page
+				const [xPos, yPos] = [event.pageX, event.pageY];
+				tooltip.style.left = `${xPos + 10}px`; // offset a few px so cursor isn’t on top
+				tooltip.style.top = `${yPos - 28}px`;
+			})
+			.on('mouseout', () => {
+				tooltip.style.opacity = 0; // fade‑out
+			});
+
 		debugInfo = `Chart rendered with ${recentData.length} points`;
 	});
 </script>
@@ -136,3 +159,23 @@
 	{/if}
 	<div bind:this={chartContainer}></div>
 </div>
+
+<!-- tooltip -->
+<div class="tooltip" bind:this={tooltip}></div>
+
+<div bind:this={chartContainer}></div>
+
+<style>
+	.tooltip {
+		position: absolute;
+		pointer-events: none; /* mouse events pass through */
+		background: rgba(0, 0, 0, 0.75);
+		color: #fff;
+		padding: 0.5rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.85rem;
+		opacity: 0; /* start hidden */
+		transition: opacity 0.15s ease;
+		z-index: 10;
+	}
+</style>
