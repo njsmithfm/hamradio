@@ -2,26 +2,48 @@
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
 
-	export let data = [];
+	/** --------------------------------------------------------------
+	 *  INPUT
+	 * -------------------------------------------------------------- */
+	export let data = []; // raw NOAA JSON array
 
-	let chartContainer;
+	/** --------------------------------------------------------------
+	 *  DOM references
+	 * -------------------------------------------------------------- */
+	let chartContainer; // <div bind:this={chartContainer}>
+	let tooltip; // <div class="tooltip" bind:this={tooltip}>
 	let debugInfo = '';
-	let tooltip;
 
+	/** --------------------------------------------------------------
+	 *  Colour scale – **must be defined before we draw anything**
+	 * -------------------------------------------------------------- */
+	const color = d3
+		.scaleLinear()
+		.domain([0, 5, 9]) // low → medium → high K‑index
+		.range(['#00ff00', '#ffff00', '#ff0000']); // green → yellow → red
+
+	/** --------------------------------------------------------------
+	 *  Mount & draw
+	 * -------------------------------------------------------------- */
 	onMount(() => {
 		console.log('Chart mounting...');
 		console.log('Raw data received:', data);
 		console.log('Data length:', data.length);
 
-		if (data.length === 0) {
+		if (!data?.length) {
 			debugInfo = 'No data received';
 			return;
 		}
 
-		// Check what the first item looks like
+		// -----------------------------------------------------------------
+		// Basic sanity checks (helpful while you develop)
+		// -----------------------------------------------------------------
 		console.log('First data item:', data[0]);
 		console.log('time_tag format:', data[0].time_tag);
 
+		// -----------------------------------------------------------------
+		// Layout
+		// -----------------------------------------------------------------
 		const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 		const width = 600 - margin.left - margin.right;
 		const height = 300 - margin.top - margin.bottom;
@@ -34,24 +56,29 @@
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		// Try parsing the time - this is where it usually breaks
+		// -----------------------------------------------------------------
+		// Parse dates – using native Date (works for the ISO‑like strings we get)
+		// -----------------------------------------------------------------
 		const parseTime = (str) => new Date(str);
 
-		// Take last 24 and prepare data
+		// -----------------------------------------------------------------
+		// Prepare the last 24 points (or fewer if the dataset is short)
+		// -----------------------------------------------------------------
 		const recentData = data.slice(-24).map((d) => {
-			const parsedTime = parseTime(d.time_tag);
-			console.log('Parsing:', d.time_tag, '→', parsedTime); // DEBUG LINE
-
+			const parsed = parseTime(d.time_tag);
+			console.log('Parsing:', d.time_tag, '→', parsed); // DEBUG
 			return {
-				time: parsedTime,
+				time: parsed,
 				value: +d.kp_index,
-				originalTime: d.time_tag // Keep original for debugging
+				originalTime: d.time_tag // keep for debugging if needed
 			};
 		});
 
-		// Check if any times are null
+		// -----------------------------------------------------------------
+		// Guard against failed parses (null dates)
+		// -----------------------------------------------------------------
 		const nullTimes = recentData.filter((d) => d.time === null);
-		if (nullTimes.length > 0) {
+		if (nullTimes.length) {
 			debugInfo = `ERROR: ${nullTimes.length} dates failed to parse!`;
 			console.error('Failed to parse these dates:', nullTimes);
 			return;
@@ -59,23 +86,23 @@
 
 		console.log('Processed data:', recentData);
 
-		// Set up scales
+		// -----------------------------------------------------------------
+		// Scales
+		// -----------------------------------------------------------------
 		const xExtent = d3.extent(recentData, (d) => d.time);
 		console.log('X extent (time range):', xExtent);
 
 		const x = d3.scaleTime().domain(xExtent).range([0, width]);
 
-		const y = d3.scaleLinear().domain([0, 9]).range([height, 0]);
+		const y = d3
+			.scaleLinear()
+			.domain([0, 9]) // K‑index range
+			.nice()
+			.range([height, 0]);
 
-		// Test the scales
-		console.log('First point maps to:', {
-			x: x(recentData[0].time),
-			y: y(recentData[0].value)
-		});
-
-		//
-
-		// Add axes
+		// -----------------------------------------------------------------
+		// Axes
+		// -----------------------------------------------------------------
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${height})`)
@@ -87,7 +114,7 @@
 
 		svg.append('g').call(d3.axisLeft(y)).style('font-size', '12px');
 
-		// Y axis label
+		// Y‑axis label
 		svg
 			.append('text')
 			.attr('transform', 'rotate(-90)')
@@ -95,9 +122,11 @@
 			.attr('x', 0 - height / 2)
 			.attr('dy', '1em')
 			.style('text-anchor', 'middle')
-			.text('K-Index');
+			.text('K‑Index');
 
-		// Add the line
+		// -----------------------------------------------------------------
+		// Line (trend)
+		// -----------------------------------------------------------------
 		const line = d3
 			.line()
 			.x((d) => x(d.time))
@@ -112,7 +141,9 @@
 			.attr('stroke-width', 2)
 			.attr('d', line);
 
-		// Add dots
+		// -----------------------------------------------------------------
+		// Circles – **use the colour scale for the fill**
+		// -----------------------------------------------------------------
 		const circles = svg
 			.selectAll('circle')
 			.data(recentData)
@@ -120,30 +151,40 @@
 			.append('circle')
 			.attr('cx', (d) => {
 				const xPos = x(d.time);
-				console.log('Circle at time', d.time, '→ x =', xPos); // DEBUG
+				console.log('Circle at time', d.time, '→ x =', xPos); // debug
 				return xPos;
 			})
 			.attr('cy', (d) => y(d.value))
 			.attr('r', 4)
-			.attr('fill', '#2563eb')
+			.attr('fill', (d) => color(d.value)) // <-- colour scale
 			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
+		// -----------------------------------------------------------------
+		// Tooltip handling
+		// -----------------------------------------------------------------
 		circles
 			.on('mouseover', (event, d) => {
-				// Populate tooltip HTML – customize to your needs
 				const html = `
-        
-        K‑Index: <span >${d.value}</span>
-      `;
+			<strong>${d3.timeFormat('%b %d %H:%M')(d.time)}</strong><br/>
+			K‑Index: <span style="color:${color(d.value)}">${d.value}</span>
+		  `;
 				tooltip.innerHTML = html;
 				tooltip.style.opacity = 1; // fade‑in
 			})
 			.on('mousemove', (event) => {
-				// `event.pageX/Y` are relative to the whole page
-				const [xPos, yPos] = [event.pageX, event.pageY];
-				tooltip.style.left = `${xPos + 10}px`; // offset a few px so cursor isn’t on top
-				tooltip.style.top = `${yPos - 28}px`;
+				// Keep tooltip inside the viewport
+				const { innerWidth, innerHeight } = window;
+				const rect = tooltip.getBoundingClientRect();
+
+				let left = event.pageX + 10;
+				let top = event.pageY - 28;
+
+				if (left + rect.width > innerWidth) left = event.pageX - rect.width - 10;
+				if (top + rect.height > innerHeight) top = event.pageY - rect.height - 10;
+
+				tooltip.style.left = `${left}px`;
+				tooltip.style.top = `${top}px`;
 			})
 			.on('mouseout', () => {
 				tooltip.style.opacity = 0; // fade‑out
@@ -157,13 +198,12 @@
 	{#if debugInfo}
 		<p style="color: red; font-weight: bold;">{debugInfo}</p>
 	{/if}
+	<!-- D3 will inject the SVG here -->
 	<div bind:this={chartContainer}></div>
 </div>
 
-<!-- tooltip -->
+<!-- Tooltip element (styled below) -->
 <div class="tooltip" bind:this={tooltip}></div>
-
-<div bind:this={chartContainer}></div>
 
 <style>
 	.tooltip {
