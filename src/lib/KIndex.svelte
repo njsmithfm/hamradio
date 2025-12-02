@@ -189,15 +189,10 @@
 			.on('mouseout', () => {
 				tooltip.style.opacity = 0; // fade‑out
 			});
-
-		debugInfo = `Chart rendered with ${recentData.length} points`;
 	});
 </script>
 
 <div>
-	{#if debugInfo}
-		<p style="color: red; font-weight: bold;">{debugInfo}</p>
-	{/if}
 	<!-- D3 will inject the SVG here -->
 	<div bind:this={chartContainer}></div>
 </div>
