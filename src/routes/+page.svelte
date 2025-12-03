@@ -4,6 +4,7 @@
 	import SolarFlux from '$lib/SolarFlux.svelte';
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
+	import Map from '$lib/Map.svelte';
 
 	let kIndexData = [];
 	let solarFluxData = [];
@@ -91,6 +92,9 @@
 				<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 			</div>
 
+			<div class="card wide">
+				<Map />
+			</div>
 			<!-- Weather -->
 			<div class="card wide">
 				<h2>Local Weather</h2>

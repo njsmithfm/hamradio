@@ -2,29 +2,14 @@
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
 
-	/** --------------------------------------------------------------
-	 *  INPUT
-	 * -------------------------------------------------------------- */
 	export let data = []; // raw NOAA JSON array
 
-	/** --------------------------------------------------------------
-	 *  DOM references
-	 * -------------------------------------------------------------- */
-	let chartContainer; // <div bind:this={chartContainer}>
-	let tooltip; // <div class="tooltip" bind:this={tooltip}>
+	let chartContainer;
+	let tooltip;
 	let debugInfo = '';
 
-	/** --------------------------------------------------------------
-	 *  Colour scale – **must be defined before we draw anything**
-	 * -------------------------------------------------------------- */
-	const color = d3
-		.scaleLinear()
-		.domain([0, 5, 9]) // low → medium → high K‑index
-		.range(['#00ff00', '#ffff00', '#ff0000']); // green → yellow → red
+	const color = d3.scaleLinear().domain([0, 5, 9]).range(['#00ff00', '#ffff00', '#ff0000']);
 
-	/** --------------------------------------------------------------
-	 *  Mount & draw
-	 * -------------------------------------------------------------- */
 	onMount(() => {
 		console.log('Chart mounting...');
 		console.log('Raw data received:', data);
@@ -35,15 +20,9 @@
 			return;
 		}
 
-		// -----------------------------------------------------------------
-		// Basic sanity checks (helpful while you develop)
-		// -----------------------------------------------------------------
 		console.log('First data item:', data[0]);
 		console.log('time_tag format:', data[0].time_tag);
 
-		// -----------------------------------------------------------------
-		// Layout
-		// -----------------------------------------------------------------
 		const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 		const width = 600 - margin.left - margin.right;
 		const height = 300 - margin.top - margin.bottom;
@@ -56,14 +35,8 @@
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		// -----------------------------------------------------------------
-		// Parse dates – using native Date (works for the ISO‑like strings we get)
-		// -----------------------------------------------------------------
 		const parseTime = (str) => new Date(str);
 
-		// -----------------------------------------------------------------
-		// Prepare the last 24 points (or fewer if the dataset is short)
-		// -----------------------------------------------------------------
 		const recentData = data.slice(-24).map((d) => {
 			const parsed = parseTime(d.time_tag);
 			console.log('Parsing:', d.time_tag, '→', parsed); // DEBUG
@@ -74,9 +47,6 @@
 			};
 		});
 
-		// -----------------------------------------------------------------
-		// Guard against failed parses (null dates)
-		// -----------------------------------------------------------------
 		const nullTimes = recentData.filter((d) => d.time === null);
 		if (nullTimes.length) {
 			debugInfo = `ERROR: ${nullTimes.length} dates failed to parse!`;
@@ -86,9 +56,6 @@
 
 		console.log('Processed data:', recentData);
 
-		// -----------------------------------------------------------------
-		// Scales
-		// -----------------------------------------------------------------
 		const xExtent = d3.extent(recentData, (d) => d.time);
 		console.log('X extent (time range):', xExtent);
 
@@ -100,9 +67,6 @@
 			.nice()
 			.range([height, 0]);
 
-		// -----------------------------------------------------------------
-		// Axes
-		// -----------------------------------------------------------------
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${height})`)
@@ -141,9 +105,6 @@
 			.attr('stroke-width', 2)
 			.attr('d', line);
 
-		// -----------------------------------------------------------------
-		// Circles – **use the colour scale for the fill**
-		// -----------------------------------------------------------------
 		const circles = svg
 			.selectAll('circle')
 			.data(recentData)
@@ -160,9 +121,6 @@
 			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
-		// -----------------------------------------------------------------
-		// Tooltip handling
-		// -----------------------------------------------------------------
 		circles
 			.on('mouseover', (event, d) => {
 				const html = `
@@ -193,11 +151,9 @@
 </script>
 
 <div>
-	<!-- D3 will inject the SVG here -->
 	<div bind:this={chartContainer}></div>
 </div>
 
-<!-- Tooltip element (styled below) -->
 <div class="tooltip" bind:this={tooltip}></div>
 
 <style>
@@ -209,7 +165,7 @@
 		padding: 0.5rem 0.75rem;
 		border-radius: 4px;
 		font-size: 0.85rem;
-		opacity: 0; /* start hidden */
+		opacity: 0;
 		transition: opacity 0.15s ease;
 		z-index: 10;
 	}
