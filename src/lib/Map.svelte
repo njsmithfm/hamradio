@@ -15,7 +15,7 @@
 
 	// Put your OpenWeatherMap API key in a .env file as VITE_OWM_KEY,
 	// or replace the placeholder with a literal string for a quick test.
-	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'YOUR_API_KEY';
+	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'fallback‑or‑throw‑error';
 	const WEATHER_URL = `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
 	const WEATHER_ATTRIB =
 		'&copy; <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap</a>';
