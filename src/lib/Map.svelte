@@ -13,8 +13,6 @@
 		'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' +
 		'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors';
 
-	// Put your OpenWeatherMap API key in a .env file as VITE_OWM_KEY,
-	// or replace the placeholder with a literal string for a quick test.
 	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'fallback‑or‑throw‑error';
 	const WEATHER_URL = `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
 	const WEATHER_ATTRIB =
