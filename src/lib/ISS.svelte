@@ -10,15 +10,15 @@
 	// ----- State --------------------------------------------------
 	let lat: number | null = null;
 	let lon: number | null = null;
-	let alt: number | null = null; // altitude in km (optional)
+	let altitude: number | null = null; // altitude in km (optional)
 	let timestamp: number | null = null;
 	let error = '';
 
 	// ----- Leaflet ------------------------------------------------
 	let mapDiv: HTMLDivElement;
-	let L; // Leaflet namespace (dynamic import)
-	let map; // Leaflet map instance
-	let marker; // Moving marker
+	let L;
+	let map;
+	let marker;
 
 	// ----- Functions -----------------------------------------------
 	async function fetchISS() {
@@ -31,7 +31,7 @@
 			// NASA returns numbers already, but guard against missing fields
 			lat = data.latitude ?? null;
 			lon = data.longitude ?? null;
-			alt = data.altitude ?? null; // km
+			altitude = data.altitude ?? null; // km
 			timestamp = data.timestamp ?? null;
 			error = '';
 
@@ -91,8 +91,8 @@
 	{:else if lat !== null && lon !== null}
 		<p><strong>Latitude:</strong> {lat!.toFixed(3)}°</p>
 		<p><strong>Longitude:</strong> {lon!.toFixed(3)}°</p>
-		{#if alt !== null}
-			<p><strong>Altitude:</strong> {alt!.toFixed(1)} km</p>
+		{#if altitude !== null}
+			<p><strong>Altitude:</strong> {altitude!.toFixed(1)} km</p>
 		{/if}
 		<p>
 			<small>Updated: {timestamp ? new Date(timestamp * 1000).toLocaleTimeString() : ''}</small>
