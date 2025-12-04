@@ -31,14 +31,6 @@
 		} finally {
 			loading = false;
 		}
-		// 	let time;
-		// 	const interval = setInterval(() => {
-		// 		time = new Date();
-		// 	}, 1000);
-
-		// 	return () => {
-		// 		clearInterval(interval);
-		// 	};
 	});
 </script>
 
