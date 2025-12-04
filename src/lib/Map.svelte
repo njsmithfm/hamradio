@@ -1,11 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
-	import 'leaflet/dist/leaflet.css'; // Leaflet CSS – safe for SSR
+	import 'leaflet/dist/leaflet.css';
 
-	let mapDiv; // bound to the <div> that becomes the map
-	let L; // Leaflet namespace (filled after dynamic import)
+	let mapDiv;
+	let L;
 
-	// ------------ Configuration (you can tweak) -------------------------
 	const BASE_URL = 'https://tiles.stadiamaps.com/tiles/stamen_toner_blacklite/{z}/{x}/{y}{r}.{ext}';
 	const BASE_ATTRIB =
 		'&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' +
@@ -13,25 +12,23 @@
 		'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' +
 		'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors';
 
-	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'fallback‑or‑throw‑error';
-	const WEATHER_URL = `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
-	const WEATHER_ATTRIB =
+	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'fallback-or-throw-error';
+
+	// ← Change the endpoint to precipitation (rain + snow). You can also use
+	//   “precipitation” for a combined layer, or “rain” / “snow” separately.
+	const PRECIP_URL = `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
+	const PRECIP_ATTRIB =
 		'&copy; <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap</a>';
 
-	// -----------------------------------------------------------------
 	onMount(async () => {
-		// 1️⃣ Load Leaflet **only in the browser**
 		const leaf = await import('leaflet');
 		L = leaf.default;
 
-		// 2️⃣ Verify the container exists (helps debugging)
-		console.log('🗺️ mapDiv:', mapDiv);
 		if (!mapDiv) {
 			console.error('Map container not found – aborting Leaflet init.');
 			return;
 		}
 
-		// 3️⃣ Build the tile layers (now they are in the same scope as the map)
 		const baseLayer = L.tileLayer(BASE_URL, {
 			minZoom: 0,
 			maxZoom: 20,
@@ -39,31 +36,32 @@
 			ext: 'png'
 		});
 
-		const weatherLayer = L.tileLayer(WEATHER_URL, {
-			opacity: 0.5,
-			attribution: WEATHER_ATTRIB
+		// New precipitation layer (initially hidden)
+		const precipLayer = L.tileLayer(PRECIP_URL, {
+			opacity: 5,
+			attribution: PRECIP_ATTRIB
 		});
 
-		// 4️⃣ Initialise the Leaflet map
 		const map = L.map(mapDiv, {
-			center: [44.0121, -92.4802], // Rochester, MN
+			center: [44.0121, -92.4802],
 			zoom: 10,
-			layers: [baseLayer, weatherLayer]
+			layers: [baseLayer] // start with only the base map
 		});
 
-		// 5️⃣ Optional UI to toggle the weather overlay
-		const overlays = { 'Current Weather': weatherLayer };
+		// Toggle control – you can keep the old cloud layer if you still want it
+		const overlays = {
+			Precipitation: precipLayer
+			// 'Current Weather (clouds)': weatherLayer   // optional
+		};
 		L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 	});
 </script>
 
-<!-- This div becomes the Leaflet canvas -->
 <div bind:this={mapDiv} class="leaflet-container"></div>
 
 <style>
-	/* Give the map a definite size – change as you wish */
 	.leaflet-container {
 		width: 100%;
-		height: 500px; /* or 100% if the parent .card has a fixed height */
+		height: 500px;
 	}
 </style>
