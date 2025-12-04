@@ -52,18 +52,14 @@
 						<div class="metric-label">K-Index</div>
 						<div class="metric-value">{currentKIndex}</div>
 						<div class="metric-status">
-							{currentKIndex <= 3 ? '✅ Quiet' : currentKIndex <= 5 ? '⚠️ Unsettled' : '❌ Storm'}
+							{currentKIndex <= 3 ? 'Quiet' : currentKIndex <= 5 ? 'Unsettled' : 'Storm'}
 						</div>
 					</div>
 					<div class="metric">
 						<div class="metric-label">Solar Flux</div>
 						<div class="metric-value">{currentSolarFlux.toFixed(0)}</div>
 						<div class="metric-status">
-							{currentSolarFlux > 150
-								? '✅ Excellent'
-								: currentSolarFlux > 100
-									? '👍 Good'
-									: '📉 Fair'}
+							{currentSolarFlux > 150 ? 'Excellent' : currentSolarFlux > 100 ? 'Good' : 'Fair'}
 						</div>
 					</div>
 				</div>
