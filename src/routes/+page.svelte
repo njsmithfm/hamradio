@@ -53,7 +53,11 @@
 			<div class="panel-2">02<span class="hop">-262000</span></div>
 		</div>
 		<div class="right-frame-top">
-			<div class="banner">LCARS &#149; 47988</div>
+			<div class="banner">
+				ROCHESTER MN &#149 HAM RADIO &#149; LCARS V. 24.2
+
+				<p class="go-big">Live long and prosper</p>
+			</div>
 
 			<div class="bar-panel first-bar-panel">
 				<div class="bar-1"></div>
@@ -98,10 +102,6 @@
 			</div>
 			<main>
 				<!-- Start your content here. -->
-
-				<h3 class="font-gold">LCARS Version 24.2</h3>
-
-				<p class="go-big">Live long and prosper</p>
 
 				<div class="dashboard-grid">
 					<!-- Top metrics -->
