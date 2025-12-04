@@ -50,11 +50,11 @@
 				{#if weather.shortForecast.toLowerCase().includes('storm') || weather.shortForecast
 						.toLowerCase()
 						.includes('thunder')}
-					⚠️ Thunderstorms can cause high noise levels and static
+					Thunderstorms can cause high noise levels and static
 				{:else if weather.windSpeed.includes('30') || weather.windSpeed.includes('40')}
-					🌬️ High winds - secure antennas
+					High winds - secure antennas
 				{:else}
-					✅ Weather conditions favorable
+					Weather conditions favorable
 				{/if}
 			</div>
 		</div>

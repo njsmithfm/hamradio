@@ -61,11 +61,11 @@
 				</div>
 				<div class="band-time">
 					{#if band.dayBand}
-						🌞 Best daytime
+						Best daytime
 					{:else if band.nightBand}
-						🌙 Best nighttime
+						Best nighttime
 					{:else}
-						⏰ Good 24/7
+						Good 24/7
 					{/if}
 				</div>
 			</div>
@@ -79,7 +79,7 @@
 	}
 
 	.subtitle {
-		color: #6b7280;
+		color: #000000;
 		margin-bottom: 1rem;
 	}
 
@@ -90,7 +90,7 @@
 	}
 
 	.band-card {
-		background: white;
+		background: rgb(25, 103, 139);
 		padding: 1rem;
 		border-radius: 6px;
 		border-left: 4px solid;
@@ -100,11 +100,11 @@
 	.band-name {
 		font-size: 1.5rem;
 		font-weight: bold;
-		color: #1e40af;
+		color: #1fe63a;
 	}
 
 	.band-freq {
-		color: #6b7280;
+		color: #111825;
 		font-size: 0.9rem;
 		margin: 0.25rem 0;
 	}
@@ -116,6 +116,6 @@
 
 	.band-time {
 		font-size: 0.85rem;
-		color: #6b7280;
+		color: #e9ff26;
 	}
 </style>
