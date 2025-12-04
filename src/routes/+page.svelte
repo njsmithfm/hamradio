@@ -5,6 +5,7 @@
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
 	import Map from '$lib/Map.svelte';
+	import ISS from '$lib/ISS.svelte';
 
 	let kIndexData = [];
 	let solarFluxData = [];
@@ -99,6 +100,10 @@
 			<div class="card wide">
 				<h2>Local Weather</h2>
 				<Weather />
+			</div>
+
+			<div class="card wide">
+				<ISS />
 			</div>
 		</div>
 	{/if}
