@@ -6,12 +6,15 @@
 	import Weather from '$lib/Weather.svelte';
 	import Map from '$lib/Map.svelte';
 	import ISS from '$lib/ISS.svelte';
+	import { randomQuote } from '$lib/quotes.js';
 
 	let kIndexData = [];
 	let solarFluxData = [];
 	let currentKIndex = 0;
 	let currentSolarFlux = 0;
 	let loading = true;
+
+	let quote = 'Live long and prosper';
 
 	onMount(async () => {
 		try {
@@ -25,6 +28,7 @@
 
 			solarFluxData = await fRes.json();
 			currentSolarFlux = solarFluxData.at(-1).flux;
+			quote = randomQuote();
 		} catch (e) {
 			console.error(e);
 		} finally {
@@ -57,9 +61,9 @@
 				</div>
 				<div class="right-frame-top">
 					<div class="banner">
-						ROCHESTER MN &#149 HAM RADIO &#149; LCARS V. 24.2
+						ROCHESTER MN &#149 LCARS V. 24.2
 
-						<p class="go-big">Live long and prosper</p>
+						<p class="go-big">{quote}</p>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
@@ -109,7 +113,7 @@
 						<div class="dashboard-grid">
 							<!-- Top metrics -->
 							<div class="card wide">
-								<h2>Space Weather</h2>
+								<h2>IONOSPHERIC QUANTA</h2>
 								<div class="metrics-row">
 									<div class="metric">
 										<div class="metric-label">K-Index</div>
