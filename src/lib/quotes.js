@@ -4,13 +4,13 @@ export const quotes = [
 	'Resistance is futile',
 	'Make it so!',
 	'Engage!',
-	'The needs of the many outweigh the needs of the few',
 	'Logic is the beginning of wisdom, not the end',
 	'what it is to be human: To make yourself more than you are',
 	'Openness, optimism and the spirit of curiosity',
 	'Things are only impossible until they are not',
 	"It's the unknown that defines our existence",
-	'Vamoose, ya little varmint'
+	'Vamoose, ya little varmint',
+	'The glory of creation is in its infinite diversity'
 ];
 
 export function randomQuote() {

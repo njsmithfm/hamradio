@@ -123,7 +123,7 @@
 										</div>
 									</div>
 									<div class="metric">
-										<div class="metric-label">Solar Flux</div>
+										<div class="metric-label">SFU</div>
 										<div class="metric-value">{currentSolarFlux.toFixed(0)}</div>
 										<div class="metric-status">
 											{currentSolarFlux > 150
@@ -143,7 +143,7 @@
 							</div>
 
 							<div class="card">
-								<h2>Solar Flux (30 Days)</h2>
+								<h2>SFU (30 Days)</h2>
 								<SolarFlux data={solarFluxData} />
 							</div>
 

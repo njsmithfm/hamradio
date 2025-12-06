@@ -6,19 +6,23 @@
 
 	let chartContainer;
 	let tooltip;
-	let debugInfo = '';
 
-	const color = d3.scaleLinear().domain([0, 5, 9]).range(['#00ff00', '#ffff00', '#ff0000']);
+	const colour = d3.scaleLinear().domain([0, 5, 9]).range(['#00ff00', '#ffff00', '#ff0000']);
 
 	onMount(() => {
-		if (!data?.length) {
-			debugInfo = 'No data received';
-			return;
-		}
-
 		const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 		const width = 600 - margin.left - margin.right;
 		const height = 300 - margin.top - margin.bottom;
+
+		// Take the last 24 points and turn them into usable objects
+		const recent = data.slice(-24).map((d) => ({ time: new Date(d.time_tag), value: +d.kp_index }));
+
+		const x = d3
+			.scaleTime()
+			.domain(d3.extent(recent, (d) => d.time))
+			.range([0, width]);
+
+		const y = d3.scaleLinear().domain([0, 9]).nice().range([height, 0]);
 
 		const svg = d3
 			.select(chartContainer)
@@ -28,34 +32,7 @@
 			.append('g')
 			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-		const parseTime = (str) => new Date(str);
-
-		const recentData = data.slice(-24).map((d) => {
-			const parsed = parseTime(d.time_tag);
-			return {
-				time: parsed,
-				value: +d.kp_index,
-				originalTime: d.time_tag // keep for debugging if needed
-			};
-		});
-
-		const nullTimes = recentData.filter((d) => d.time === null);
-		if (nullTimes.length) {
-			debugInfo = `ERROR: ${nullTimes.length} dates failed to parse!`;
-			console.error('Failed to parse these dates:', nullTimes);
-			return;
-		}
-
-		const xExtent = d3.extent(recentData, (d) => d.time);
-
-		const x = d3.scaleTime().domain(xExtent).range([0, width]);
-
-		const y = d3
-			.scaleLinear()
-			.domain([0, 9]) // K‑index range
-			.nice()
-			.range([height, 0]);
-
+		// Axes
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${height})`)
@@ -65,21 +42,18 @@
 			.attr('transform', 'rotate(-45)')
 			.style('text-anchor', 'end');
 
-		svg.append('g').call(d3.axisLeft(y)).style('font-size', '12px');
+		svg.append('g').call(d3.axisLeft(y).ticks(5)).style('font-size', '12px');
 
-		// Y‑axis label
 		svg
 			.append('text')
 			.attr('transform', 'rotate(-90)')
-			.attr('y', 0 - margin.left)
-			.attr('x', 0 - height / 2)
-			.attr('dy', '1em')
+			.attr('y', -margin.left + 12)
+			.attr('x', -height / 2)
+			.attr('dy', '-1em')
 			.style('text-anchor', 'middle')
 			.text('K‑Index');
 
-		// -----------------------------------------------------------------
-		// Line (trend)
-		// -----------------------------------------------------------------
+		// Line
 		const line = d3
 			.line()
 			.x((d) => x(d.time))
@@ -88,66 +62,66 @@
 
 		svg
 			.append('path')
-			.datum(recentData)
+			.datum(recent)
 			.attr('fill', 'none')
 			.attr('stroke', '#2563eb')
 			.attr('stroke-width', 2)
 			.attr('d', line);
 
-		const circles = svg
-			.selectAll('circle')
-			.data(recentData)
+		// Visible circles
+		svg
+			.selectAll('.dot')
+			.data(recent)
 			.enter()
 			.append('circle')
-			.attr('cx', (d) => {
-				const xPos = x(d.time);
-				return xPos;
-			})
+			.attr('class', 'dot')
+			.attr('cx', (d) => x(d.time))
 			.attr('cy', (d) => y(d.value))
 			.attr('r', 4)
-			.attr('fill', (d) => color(d.value)) // <-- colour scale
+			.attr('fill', (d) => colour(d.value))
 			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
-		circles
-			.on('mouseover', (event, d) => {
-				const html = `
-			<strong>${d3.timeFormat('%b %d %H:%M')(d.time)}</strong><br/>
-			K‑Index: <span style="color:${color(d.value)}">${d.value}</span>
-		  `;
-				tooltip.innerHTML = html;
-				tooltip.style.opacity = 1; // fade‑in
+		// Invisible overlay circles (3 px extra radius)
+		const overlay = svg
+			.selectAll('.overlay')
+			.data(recent)
+			.enter()
+			.append('circle')
+			.attr('class', 'overlay')
+			.attr('cx', (d) => x(d.time))
+			.attr('cy', (d) => y(d.value))
+			.attr('r', 7) // 4 px + 3 px buffer
+			.style('fill', 'transparent')
+			.style('pointer-events', 'all');
+
+		// Tooltip – snap to circle
+		overlay
+			.on('mouseover', (_, d) => {
+				tooltip.innerHTML = `
+          <strong>${d3.timeFormat('%b %d %H:%M')(d.time)}</strong><br/>
+          K‑Index: <span style="color:${colour(d.value)}">${d.value}</span>`;
+				tooltip.style.opacity = 1;
+
+				const cx = x(d.time);
+				const cy = y(d.value);
+				tooltip.style.left = `${cx + margin.left + 8}px`;
+				tooltip.style.top = `${cy + margin.top - 12}px`;
 			})
-			.on('mousemove', (event) => {
-				// Keep tooltip inside the viewport
-				const { innerWidth, innerHeight } = window;
-				const rect = tooltip.getBoundingClientRect();
-
-				let left = event.pageX + 10;
-				let top = event.pageY - 28;
-
-				if (left + rect.width > innerWidth) left = event.pageX - rect.width - 10;
-				if (top + rect.height > innerHeight) top = event.pageY - rect.height - 10;
-
-				tooltip.style.left = `${left}px`;
-				tooltip.style.top = `${top}px`;
-			})
-			.on('mouseout', () => {
-				tooltip.style.opacity = 0; // fade‑out
-			});
+			.on('mousemove', () => (tooltip.style.opacity = 1))
+			.on('mouseout', () => (tooltip.style.opacity = 0));
 	});
 </script>
 
-<div>
+<div style="position:relative;">
 	<div bind:this={chartContainer}></div>
+	<div class="tooltip" bind:this={tooltip}></div>
 </div>
-
-<div class="tooltip" bind:this={tooltip}></div>
 
 <style>
 	.tooltip {
 		position: absolute;
-		pointer-events: none; /* mouse events pass through */
+		pointer-events: none;
 		background: rgba(0, 0, 0, 0.75);
 		color: #fff;
 		padding: 0.5rem 0.75rem;
