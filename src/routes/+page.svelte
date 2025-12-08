@@ -5,7 +5,9 @@
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
 	import Map from '$lib/Map.svelte';
+	import Sun from '$lib/Sun.svelte';
 	import { randomQuote } from '$lib/quotes.js';
+	import { toStardate } from '$lib/stardate.js';
 
 	let kIndexData = [];
 	let solarFluxData = [];
@@ -13,7 +15,7 @@
 	let currentSolarFlux = 0;
 	let loading = true;
 	let outcome = 'FAVORABLE';
-	let qapla = "Qapla'!";
+	let qapla = 'Qapla!';
 
 	let quote = 'Live long and prosper';
 
@@ -30,6 +32,7 @@
 			solarFluxData = await fRes.json();
 			currentSolarFlux = solarFluxData.at(-1).flux;
 			quote = randomQuote();
+			stardate = toStardate();
 		} catch (e) {
 			console.error(e);
 		} finally {
@@ -59,7 +62,7 @@
 					-->
 					<!-- <button onclick="playSoundAndRedirect('audio2', '#')" class="panel-1-button">LCARS</button> -->
 					<div class="panel-2">
-						<span class="hop quote"> {quote}</span>
+						<!-- <span class="hop quote"> {stardate}</span> -->
 					</div>
 				</div>
 
@@ -161,6 +164,11 @@
 									<h2>Local Weather</h2>
 									<Weather />
 								</div>
+
+								<!-- <div class="card wide">
+									<h2>Our Sun</h2>
+									<Sun />
+								</div> -->
 							</div>
 
 							<!-- End content area. -->
@@ -185,7 +193,7 @@
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
-	.quote {
+	/* .quote {
 		font-size: 0.85rem;
-	}
+	} */
 </style>
