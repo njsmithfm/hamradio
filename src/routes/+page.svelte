@@ -180,3 +180,12 @@
 		<div class="baseboard"></div>
 	</div>
 {/if}
+
+<style>
+	.njsmithfm:hover {
+		color: rgb(255, 0, 212);
+	}
+	.quote {
+		font-size: 0.85rem;
+	}
+</style>
