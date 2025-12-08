@@ -73,14 +73,14 @@
 			</div>
 			<div class="wrap" id="gap">
 				<div class="left-frame">
-					<!--
-					** SCROLL TO TOP OF PAGE BUTTON **
-					This button is initially hidden, and is styled like a panel in the sidebar. It appears at the bottom of the page after vertical scrolling. If you don't want the sound effect, replace with this:
+					<!-- ** SCROLL TO TOP OF PAGE BUTTON ** This button is initially hidden, and is styled like a
+					panel in the sidebar. It appears at the bottom of the page after vertical scrolling. If
+					you don't want the sound effect, replace with this:
 					<button onclick="topFunction()" id="topBtn"><span class="hop">screen</span> top</button>
-					-->
-					<!-- <button onclick="topFunction(); playSoundAndRedirect('audio4', '#')" id="topBtn"> -->
 
-					<!-- <span class="hop">screen</span> top</button> -->
+					<button onclick="topFunction(); playSoundAndRedirect('audio4', '#')" id="topBtn"> -->
+					<!-- <span class="hop">screen</span> top</button
+					> -->
 
 					<div>
 						<div class="panel-3">03<span class="hop">-111968</span></div>
@@ -176,4 +176,5 @@
 		</section>
 		<div class="headtrim"></div>
 		<div class="baseboard"></div>
-	</div>{/if}
+	</div>
+{/if}
