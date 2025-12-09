@@ -131,27 +131,16 @@
 										QAPLA!
 									{/if}
 								</h2>
-								<div class="metrics-row" style="display:block">
-									<div class="metric-label">
+
+								<!-- Charts -->
+								<div class="card wide">
+									<h2>
 										K-Index: {currentKIndex}, {currentKIndex <= 3
 											? 'Quiet'
 											: currentKIndex <= 5
 												? 'Unsettled'
 												: 'Storm'}
-									</div>
-
-									<div class="metric-label">
-										SFU: {currentSolarFlux.toFixed(0)}, {currentSolarFlux > 150
-											? 'Excellent'
-											: currentSolarFlux > 100
-												? 'Good'
-												: 'Fair'}
-									</div>
-								</div>
-
-								<!-- Charts -->
-								<div class="card wide">
-									<h2>K-Index</h2>
+									</h2>
 									<KIndex data={kIndexData} />
 								</div>
 								<div class="card wide">
@@ -160,7 +149,13 @@
 								</div>
 
 								<div class="card">
-									<h2>Solar Flux Units</h2>
+									<h2>
+										Solar Flux Units: {currentSolarFlux.toFixed(0)}, {currentSolarFlux > 150
+											? 'Optimal'
+											: currentSolarFlux > 100
+												? 'Adequate'
+												: 'Fair'}
+									</h2>
 									<SolarFlux data={solarFluxData} />
 								</div>
 
