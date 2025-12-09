@@ -11,7 +11,7 @@
 	import { randomQuote, toStardate } from '$lib/trekEphemera.js';
 
 	let kIndexData = [];
-	let aIndexData = [];
+	let aIndexData = 0;
 	let solarFluxData = [];
 	let currentKIndex = 0;
 	let currentAIndex = 0;
@@ -25,14 +25,20 @@
 
 	onMount(async () => {
 		try {
-			const [kRes, aRes, fRes] = await Promise.all([
+			// Order matters – the array indices must line‑up with the variables
+			const [
+				kRes, // planetary_k_index_1m.json
+				aRes, // predicted_fredericksburg_a_index.json
+				fRes // f107_cm_flux.json
+			] = await Promise.all([
 				fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json'),
 				fetch('https://services.swpc.noaa.gov/json/predicted_fredericksburg_a_index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
 
+			// Parse each response
 			kIndexData = await kRes.json();
-			aIndexData = await aRes.json();
+			aIndexData = await aRes.json(); // ← now really the A‑Index feed
 			solarFluxData = await fRes.json();
 
 			// Pull the latest values (optional, for the dashboard cards)
@@ -73,7 +79,18 @@
 				</div>
 
 				<div class="right-frame-top">
-					<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
+					<div class="nav-row">
+						<nav class="tab-bar">
+							<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
+								Space Weather
+							</button>
+
+							<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
+								Local Weather
+							</button>
+						</nav>
+						<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
+					</div>
 
 					<div class="bar-panel first-bar-panel">
 						<div class="bar-1"></div>
@@ -123,33 +140,14 @@
 						<div class="bar-10"></div>
 					</div>
 					<main>
-						<!-- {!-- --------------------------------------------------------------
-							 TAB BAR – placed right at the top of the <main> area
-							 -------------------------------------------------------------- --} -->
-						<nav class="tab-bar">
-							<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
-								Space Weather
-							</button>
-
-							<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
-								Local Weather
-							</button>
-						</nav>
-
-						<!-- {!-- --------------------------------------------------------------
-							 TAB CONTENT
-							 -------------------------------------------------------------- --} -->
 						{#if activeTab === 0}
-							<!-- {!-- ---------- SPACE‑WEATHER TAB (charts + bands) ---------- --} -->
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
 										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
 										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
 									</h2>
-
-									<!-- {!-- K‑Index chart –––––––––––––––––––––––––––––––––––––––– --} -->
-									<div class="card wide">
+									<div class="card wide chart-row">
 										<h4>
 											K‑Index: {currentKIndex},
 											{#if currentKIndex <= 3}
@@ -161,15 +159,20 @@
 											{/if}
 										</h4>
 										<KIndex data={kIndexData} />
-									</div>
-
-									<!-- {!-- A‑Index chart –––––––––––––––––––––––––––––––––––––––– --} -->
-									<div class="card wide">
-										<h4>A‑Index</h4>
+										<h4>
+											A‑Index:
+											<!-- {currentAIndex}, -->
+											{#if currentAIndex <= 100}
+												Quiet
+											{:else if currentAIndex <= 200}
+												Unsettled
+											{:else}
+												Storm
+											{/if}
+										</h4>
 										<AIndex data={aIndexData} />
 									</div>
 
-									<!-- {!-- Solar‑Flux chart –––––––––––––––––––––––––––––––––––– --} -->
 									<div class="card">
 										<h4>
 											Solar Flux Units: {currentSolarFlux.toFixed(0)},
@@ -184,14 +187,12 @@
 										<SolarFlux data={solarFluxData} />
 									</div>
 
-									<!-- {!-- Bands component – now on the same tab ––––––––––––––– --} -->
 									<div class="card wide">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
 								</div>
 							</div>
 						{:else}
-							<!-- {!-- ---------- LOCAL‑WEATHER TAB (map + weather) ---------- --} -->
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
@@ -199,12 +200,9 @@
 										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
 									</h2>
 
-									<!-- {!-- Map –––––––––––––––––––––––––––––––––––––––––––––––– --} -->
 									<div class="card wide">
 										<Map />
 									</div>
-
-									<!-- {!-- Weather –––––––––––––––––––––––––––––––––––––––––––– --} -->
 									<div class="card wide">
 										<h4>Local Weather</h4>
 										<Weather />
@@ -229,6 +227,18 @@
 {/if}
 
 <style>
+	.chart-row {
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+	.nav-row {
+		margin: 1rem;
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
