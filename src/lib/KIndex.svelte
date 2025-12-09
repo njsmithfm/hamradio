@@ -81,8 +81,8 @@
 		<g transform={`translate(0,${height})`}>
 			{#each xScale.ticks(6) as t}
 				<g transform={`translate(${xScale(t)},0)`}>
-					<line y2={height} stroke="#ccc" />
-					<text y="15" text-anchor="middle" font-size="12">
+					<line y2={height} />
+					<text x="25" y="35" text-anchor="middle" font-size="6" fill="#ffffff">
 						{d3.timeFormat('%b %d')(t)}
 					</text>
 				</g>
@@ -94,7 +94,7 @@
 			{#each yScale.ticks(5) as t}
 				<g transform={`translate(0,${yScale(t)})`}>
 					<line x2={width} stroke="#ccc" />
-					<text x="-8" dy="0.32em" text-anchor="end" font-size="12">{t}</text>
+					<text x="-8" dy="0.32em" text-anchor="end" font-size="12" fill="#ffffff">{t}</text>
 				</g>
 			{/each}
 			<text
