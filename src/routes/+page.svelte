@@ -86,7 +86,7 @@
 							</button>
 
 							<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
-								Local Weather
+								Earth Weather
 							</button>
 						</nav>
 						<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
