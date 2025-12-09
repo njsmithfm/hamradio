@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 	import KIndex from '$lib/KIndex.svelte';
+
+	import AIndex from '$lib/AIndex.svelte';
 	import SolarFlux from '$lib/SolarFlux.svelte';
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
@@ -9,6 +11,7 @@
 	import { randomQuote, toStardate } from '$lib/trekEphemera.js';
 
 	let kIndexData = [];
+	let aIndexData = [];
 	let solarFluxData = [];
 	let currentKIndex = 0;
 	let currentSolarFlux = 0;
@@ -142,9 +145,11 @@
 								</div>
 
 								<!-- Charts -->
-								<div class="card">
+								<div class="card wide">
 									<h2>K-Index</h2>
 									<KIndex data={kIndexData} />
+									<h2>A-Index</h2>
+									<AIndex data={aIndexData} />
 								</div>
 
 								<div class="card">
