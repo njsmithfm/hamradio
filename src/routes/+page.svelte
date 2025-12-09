@@ -14,7 +14,6 @@
 	let currentSolarFlux = 0;
 	let loading = true;
 	let outcome = 'FAVORABLE';
-	let qapla = 'Qapla!';
 
 	let quote = randomQuote();
 	let stardate = toStardate();
@@ -119,7 +118,11 @@
 
 						<div class="dashboard-grid">
 							<div class="card">
-								<h2>PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION. {qapla}</h2>
+								<h2>
+									PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION. {#if outcome == 'FAVORABLE'}
+										QAPLA!
+									{/if}
+								</h2>
 								<div class="metrics-row" style="display:block">
 									<div class="metric-label">
 										K-Index: {currentKIndex}, {currentKIndex <= 3
