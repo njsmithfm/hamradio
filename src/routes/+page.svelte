@@ -134,28 +134,28 @@
 
 								<!-- Charts -->
 								<div class="card wide">
-									<h2>
+									<h4>
 										K-Index: {currentKIndex}, {currentKIndex <= 3
 											? 'Quiet'
 											: currentKIndex <= 5
 												? 'Unsettled'
 												: 'Storm'}
-									</h2>
+									</h4>
 									<KIndex data={kIndexData} />
 								</div>
 								<div class="card wide">
-									<h2>A-Index</h2>
+									<h4>A-Index</h4>
 									<AIndex data={aIndexData} />
 								</div>
 
 								<div class="card">
-									<h2>
+									<h4>
 										Solar Flux Units: {currentSolarFlux.toFixed(0)}, {currentSolarFlux > 150
 											? 'Optimal'
 											: currentSolarFlux > 100
 												? 'Adequate'
 												: 'Fair'}
-									</h2>
+									</h4>
 									<SolarFlux data={solarFluxData} />
 								</div>
 
@@ -169,7 +169,7 @@
 								</div>
 								<!-- Weather -->
 								<div class="card wide">
-									<h2>Local Weather</h2>
+									<h4>Local Weather</h4>
 									<Weather />
 								</div>
 

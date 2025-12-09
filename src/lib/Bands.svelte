@@ -47,7 +47,7 @@
 </script>
 
 <div class="bands-container">
-	<h3>HF Band Conditions</h3>
+	<h4>HF Band Conditions</h4>
 	<p class="subtitle">Based on Solar Flux: {solarFlux.toFixed(0)} SFU, K-Index: {kIndex}</p>
 
 	<div class="bands-grid">
