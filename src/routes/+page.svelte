@@ -79,17 +79,20 @@
 				</div>
 
 				<div class="right-frame-top">
-					<div class="nav-row">
-						<nav class="tab-bar">
-							<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
-								Space Weather
-							</button>
+					<div>
+						<div class="nav-row">
+							<nav class="tab-bar">
+								<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
+									Space Weather
+								</button>
 
-							<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
-								Earth Weather
-							</button>
-						</nav>
-						<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
+								<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
+									Earth Weather
+								</button>
+							</nav>
+							<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
+						</div>
+						<p class="quote">{quote}</p>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
@@ -242,7 +245,7 @@
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
-	/* .quote {
+	.quote {
 		font-size: 0.85rem;
-	} */
+	}
 </style>
