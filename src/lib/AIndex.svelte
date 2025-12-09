@@ -21,7 +21,7 @@
 	let recent = [];
 	$: recent = data.slice(-24).map((d) => ({
 		time: new Date(d.time_tag),
-		value: +d.a_index
+		value: +d.a
 	}));
 	$: x.domain(d3.extent(recent, (d) => d.time));
 
@@ -48,10 +48,9 @@
 			{#each x.ticks(6) as t}
 				<g transform="translate({x(t)}, 0)">
 					<line y2={height} stroke="#ccc" />
-					<text y="15" text-anchor="middle" font-size="12"
-						>{t}
-						{d3.timeFormat('%b %d')(t)}</text
-					>
+					<text y="15" text-anchor="middle" font-size="12">
+						{d3.timeFormat('%b %d')(t)}
+					</text>
 				</g>
 			{/each}
 		</g>

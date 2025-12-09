@@ -14,6 +14,7 @@
 	let aIndexData = [];
 	let solarFluxData = [];
 	let currentKIndex = 0;
+	let currentAIndex = 0;
 	let currentSolarFlux = 0;
 	let loading = true;
 	let outcome = 'FAVORABLE';
@@ -23,18 +24,22 @@
 
 	onMount(async () => {
 		try {
-			const [kRes, fRes] = await Promise.all([
+			const [kRes, aRes, fRes] = await Promise.all([
 				fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json'),
+				fetch('https://services.swpc.noaa.gov/json/predicted_fredericksburg_a_index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
 
 			kIndexData = await kRes.json();
-			currentKIndex = kIndexData.at(-1).kp_index;
-
+			aIndexData = await aRes.json();
 			solarFluxData = await fRes.json();
+
+			// Pull the latest values (optional, for the dashboard cards)
+			currentKIndex = kIndexData.at(-1).kp_index;
+			currentAIndex = aIndexData.at(-1).a; // field name in the 1‑min feed
 			currentSolarFlux = solarFluxData.at(-1).flux;
 		} catch (e) {
-			console.error(e);
+			console.error('Failed to load space‑weather data:', e);
 		} finally {
 			loading = false;
 		}
@@ -148,6 +153,8 @@
 								<div class="card wide">
 									<h2>K-Index</h2>
 									<KIndex data={kIndexData} />
+								</div>
+								<div class="card wide">
 									<h2>A-Index</h2>
 									<AIndex data={aIndexData} />
 								</div>
