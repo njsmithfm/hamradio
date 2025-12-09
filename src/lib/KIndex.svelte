@@ -75,76 +75,85 @@
 	}
 </script>
 
-<svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
-	<g transform={`translate(${margin.left},${margin.top})`}>
-		<!-- X‑axis -->
-		<g transform={`translate(0,${height})`}>
-			{#each xScale.ticks(6) as t}
-				<g transform={`translate(${xScale(t)},0)`}>
-					<line y2={height} />
-					<text x="25" y="35" text-anchor="middle" font-size="6" fill="#ffffff">
-						{d3.timeFormat('%b %d')(t)}
-					</text>
-				</g>
-			{/each}
+<div class="chart-wrapper" style="position:relative;">
+	<svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+		<g transform={`translate(${margin.left},${margin.top})`}>
+			<!-- X‑axis -->
+			<g transform={`translate(0,${height})`}>
+				{#each xScale.ticks(6) as t}
+					<g transform={`translate(${xScale(t)},0)`}>
+						<line y2={height} />
+						<text x="25" y="35" text-anchor="middle" font-size="6" fill="#ffffff">
+							{d3.timeFormat('%b %d')(t)}
+						</text>
+					</g>
+				{/each}
+			</g>
+
+			<!-- Y‑axis -->
+			<g>
+				{#each yScale.ticks(5) as t}
+					<g transform={`translate(0,${yScale(t)})`}>
+						<line x2={width} stroke="#ccc" />
+						<text x="-8" dy="0.32em" text-anchor="end" font-size="12" fill="#ffffff">{t}</text>
+					</g>
+				{/each}
+				<text
+					transform="rotate(-90)"
+					y={-margin.left + 12}
+					x={-height / 2}
+					dy="-1em"
+					text-anchor="middle"
+					font-size="12"
+				>
+					K‑Index
+				</text>
+			</g>
+
+			<!-- Line path (only if we have data) -->
+			{#if recent.length}
+				<path d={line(recent)} fill="none" stroke="#2563eb" stroke-width="2" />
+
+				<!-- Points + hover overlay -->
+				{#each recent as d}
+					<circle
+						role="img"
+						aria-label={`Data point ${d.time}: ${d.value}`}
+						cx={xScale(d.time)}
+						cy={yScale(d.value)}
+						r="4"
+						fill={color(d.value)}
+						stroke="#1e40af"
+						stroke-width="1"
+						on:mouseenter={() => show(d)}
+						on:mouseleave={hide}
+					/>
+				{/each}
+			{/if}
 		</g>
+	</svg>
 
-		<!-- Y‑axis -->
-		<g>
-			{#each yScale.ticks(5) as t}
-				<g transform={`translate(0,${yScale(t)})`}>
-					<line x2={width} stroke="#ccc" />
-					<text x="-8" dy="0.32em" text-anchor="end" font-size="12" fill="#ffffff">{t}</text>
-				</g>
-			{/each}
-			<text
-				transform="rotate(-90)"
-				y={-margin.left + 12}
-				x={-height / 2}
-				dy="-1em"
-				text-anchor="middle"
-				font-size="12"
-			>
-				K‑Index
-			</text>
-		</g>
-
-		<!-- Line path (only if we have data) -->
-		{#if recent.length}
-			<path d={line(recent)} fill="none" stroke="#2563eb" stroke-width="2" />
-
-			<!-- Points + hover overlay -->
-			{#each recent as d}
-				<circle
-					role="img"
-					aria-label={`Data point ${d.time}: ${d.value}`}
-					cx={xScale(d.time)}
-					cy={yScale(d.value)}
-					r="4"
-					fill={color(d.value)}
-					stroke="#1e40af"
-					stroke-width="1"
-					on:mouseenter={() => show(d)}
-					on:mouseleave={hide}
-				/>
-			{/each}
-		{/if}
-	</g>
-</svg>
-
-<!-- Tooltip (identical to the A‑Index component) -->
-<div
-	class="tooltip"
-	style="
-		left:{tipX}px;
-		top:{tipY}px;
-		opacity:{tipVisible ? 1 : 0};
-	"
->
-	{@html tipHtml}
+	<div
+		class="tooltip"
+		style="
+            left:{tipX}px;
+            top:{tipY}px;
+            opacity:{tipVisible ? 1 : 0};
+        "
+	>
+		{@html tipHtml}
+	</div>
 </div>
 
 <style>
+	.chart-wrapper {
+		position: relative;
+		width: 100%;
+		overflow: visible;
+		height: 45vh;
+		min-height: 250px;
+	}
+
 	.tooltip {
 		position: absolute;
 		pointer-events: none;
@@ -154,5 +163,6 @@
 		border-radius: 4px;
 		font-size: 0.85rem;
 		transition: opacity 0.15s ease;
+		z-index: 10;
 	}
 </style>

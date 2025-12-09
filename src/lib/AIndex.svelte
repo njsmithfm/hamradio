@@ -29,6 +29,7 @@
 		tipX = 0,
 		tipY = 0,
 		tipHtml = '';
+
 	function show(d) {
 		tipHtml = `<strong>${d3.timeFormat('%b %d %H:%M')(d.time)}</strong>
         <br/>A-Index: <span style="color:${color(d.value)}">${d.value} nT</span>`;
@@ -41,63 +42,78 @@
 	}
 </script>
 
-<svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
-	<g transform="translate({margin.left},{margin.top})">
-		<!-- x-axis -->
-		<g transform="translate(0,{height})">
-			{#each x.ticks(6) as t}
-				<g transform="translate({x(t)}, 0)">
-					<line y2={height} />
-					<text y="15" text-anchor="middle" font-size="12" fill="#ffffff">
-						{d3.timeFormat('%b %d')(t)}
-					</text>
-				</g>
+<div class="chart-wrapper" style="position:relative;">
+	<svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+		<g transform="translate({margin.left},{margin.top})">
+			<!-- x-axis -->
+			<g transform="translate(0,{height})">
+				{#each x.ticks(6) as t}
+					<g transform="translate({x(t)}, 0)">
+						<line y2={height} />
+						<text y="15" text-anchor="middle" font-size="12" fill="#ffffff">
+							{d3.timeFormat('%b %d')(t)}
+						</text>
+					</g>
+				{/each}
+			</g>
+
+			<g>
+				{#each y.ticks(5) as t}
+					<g transform="translate(0,{y(t)})">
+						<line x2={width} stroke="#ccc" />
+						<text x="-8" dy="0.32em" text-anchor="end" font-size="12" fill="#ffffff">{t}</text>
+					</g>
+				{/each}
+				<text
+					transform="rotate(-90)"
+					y={-margin.left + 12}
+					x={-height / 2}
+					dy="-1em"
+					text-anchor="middle"
+					font-size="12">A-Index (nT)</text
+				>
+			</g>
+
+			<!-- line -->
+			<path d={line(recent)} fill="none" stroke="#2563eb" stroke-width="2" />
+
+			<!-- points with hover -->
+			{#each recent as d}
+				<circle
+					role="img"
+					aria-label={`Data point ${d.time}: ${d.value}`}
+					cx={x(d.time)}
+					cy={y(d.value)}
+					r="4"
+					fill={color(d.value)}
+					stroke="#1e40af"
+					stroke-width="1"
+					on:mouseenter={() => show(d)}
+					on:mouseleave={hide}
+				/>
 			{/each}
 		</g>
-
-		<g>
-			{#each y.ticks(5) as t}
-				<g transform="translate(0,{y(t)})">
-					<line x2={width} stroke="#ccc" />
-					<text x="-8" dy="0.32em" text-anchor="end" font-size="12" fill="#ffffff">{t}</text>
-				</g>
-			{/each}
-			<text
-				transform="rotate(-90)"
-				y={-margin.left + 12}
-				x={-height / 2}
-				dy="-1em"
-				text-anchor="middle"
-				font-size="12">A-Index (nT)</text
-			>
-		</g>
-
-		<!-- line -->
-		<path d={line(recent)} fill="none" stroke="#2563eb" stroke-width="2" />
-
-		<!-- points with hover -->
-		{#each recent as d}
-			<circle
-				role="img"
-				aria-label={`Data point ${d.time}: ${d.value}`}
-				cx={x(d.time)}
-				cy={y(d.value)}
-				r="4"
-				fill={color(d.value)}
-				stroke="#1e40af"
-				stroke-width="1"
-				on:mouseenter={() => show(d)}
-				on:mouseleave={hide}
-			/>
-		{/each}
-	</g>
-</svg>
-
-<div class="tooltip" style="left:{tipX}px; top:{tipY}px; opacity:{tipVisible ? 1 : 0};">
-	{@html tipHtml}
+	</svg>
+	<div
+		class="tooltip"
+		style="
+        left:{tipX}px;
+        top:{tipY}px;
+        opacity:{tipVisible ? 1 : 0};
+    "
+	>
+		{@html tipHtml}
+	</div>
 </div>
 
 <style>
+	.chart-wrapper {
+		position: relative;
+		width: 100%;
+		overflow: visible;
+		height: 45vh;
+		min-height: 250px;
+	}
 	.tooltip {
 		position: absolute;
 		pointer-events: none;
