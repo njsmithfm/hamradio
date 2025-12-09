@@ -18,6 +18,7 @@
 	let currentSolarFlux = 0;
 	let loading = true;
 	let outcome = 'FAVORABLE';
+	let activeTab = 0;
 
 	let quote = randomQuote();
 	let stardate = toStardate();
@@ -122,65 +123,95 @@
 						<div class="bar-10"></div>
 					</div>
 					<main>
-						<!-- Start your content here. -->
+						<!-- {!-- --------------------------------------------------------------
+							 TAB BAR – placed right at the top of the <main> area
+							 -------------------------------------------------------------- --} -->
+						<nav class="tab-bar">
+							<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
+								Space Weather
+							</button>
 
-						<div class="dashboard-grid">
-							<div class="card">
-								<h2>
-									PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION. {#if outcome == 'FAVORABLE'}
-										QAPLA!
-									{/if}
-								</h2>
+							<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
+								Local Weather
+							</button>
+						</nav>
 
-								<!-- Charts -->
-								<div class="card wide">
-									<h4>
-										K-Index: {currentKIndex}, {currentKIndex <= 3
-											? 'Quiet'
-											: currentKIndex <= 5
-												? 'Unsettled'
-												: 'Storm'}
-									</h4>
-									<KIndex data={kIndexData} />
-								</div>
-								<div class="card wide">
-									<h4>A-Index</h4>
-									<AIndex data={aIndexData} />
-								</div>
-
+						<!-- {!-- --------------------------------------------------------------
+							 TAB CONTENT
+							 -------------------------------------------------------------- --} -->
+						{#if activeTab === 0}
+							<!-- {!-- ---------- SPACE‑WEATHER TAB (charts + bands) ---------- --} -->
+							<div class="dashboard-grid">
 								<div class="card">
-									<h4>
-										Solar Flux Units: {currentSolarFlux.toFixed(0)}, {currentSolarFlux > 150
-											? 'Optimal'
-											: currentSolarFlux > 100
-												? 'Adequate'
-												: 'Fair'}
-									</h4>
-									<SolarFlux data={solarFluxData} />
-								</div>
+									<h2>
+										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
+										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
+									</h2>
 
-								<!-- Band Conditions -->
-								<div class="card wide">
-									<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
-								</div>
+									<!-- {!-- K‑Index chart –––––––––––––––––––––––––––––––––––––––– --} -->
+									<div class="card wide">
+										<h4>
+											K‑Index: {currentKIndex},
+											{#if currentKIndex <= 3}
+												Quiet
+											{:else if currentKIndex <= 5}
+												Unsettled
+											{:else}
+												Storm
+											{/if}
+										</h4>
+										<KIndex data={kIndexData} />
+									</div>
 
-								<div class="card wide">
-									<Map />
-								</div>
-								<!-- Weather -->
-								<div class="card wide">
-									<h4>Local Weather</h4>
-									<Weather />
-								</div>
+									<!-- {!-- A‑Index chart –––––––––––––––––––––––––––––––––––––––– --} -->
+									<div class="card wide">
+										<h4>A‑Index</h4>
+										<AIndex data={aIndexData} />
+									</div>
 
-								<!-- <div class="card wide">
-									<h2>Our Sun</h2>
-									<Sun />
-								</div> -->
+									<!-- {!-- Solar‑Flux chart –––––––––––––––––––––––––––––––––––– --} -->
+									<div class="card">
+										<h4>
+											Solar Flux Units: {currentSolarFlux.toFixed(0)},
+											{#if currentSolarFlux > 150}
+												Optimal
+											{:else if currentSolarFlux > 100}
+												Adequate
+											{:else}
+												Fair
+											{/if}
+										</h4>
+										<SolarFlux data={solarFluxData} />
+									</div>
+
+									<!-- {!-- Bands component – now on the same tab ––––––––––––––– --} -->
+									<div class="card wide">
+										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
+									</div>
+								</div>
 							</div>
+						{:else}
+							<!-- {!-- ---------- LOCAL‑WEATHER TAB (map + weather) ---------- --} -->
+							<div class="dashboard-grid">
+								<div class="card">
+									<h2>
+										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
+										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
+									</h2>
 
-							<!-- End content area. -->
-						</div>
+									<!-- {!-- Map –––––––––––––––––––––––––––––––––––––––––––––––– --} -->
+									<div class="card wide">
+										<Map />
+									</div>
+
+									<!-- {!-- Weather –––––––––––––––––––––––––––––––––––––––––––– --} -->
+									<div class="card wide">
+										<h4>Local Weather</h4>
+										<Weather />
+									</div>
+								</div>
+							</div>
+						{/if}
 					</main>
 					<footer>
 						<!-- Your copyright information is only a suggestion and you can choose to delete it. -->
