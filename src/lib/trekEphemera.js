@@ -19,3 +19,17 @@ export function randomQuote() {
 	const i = Math.floor(Math.random() * quotes.length);
 	return quotes[i].toUpperCase();
 }
+
+export function toStardate() {
+	const now = new Date();
+	const year = now.getFullYear();
+	const month = now.getMonth() + 1;
+	const day = now.getDate();
+
+	const yy = String(year).slice(-2);
+	const mm = String(month).padStart(2, '0');
+	const dd = String(day).padStart(2, '0');
+
+	const stardate = `${yy}${mm}.${dd}`;
+	return stardate;
+}

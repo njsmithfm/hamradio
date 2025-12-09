@@ -6,8 +6,7 @@
 	import Weather from '$lib/Weather.svelte';
 	import Map from '$lib/Map.svelte';
 	import Sun from '$lib/Sun.svelte';
-	import { randomQuote } from '$lib/quotes.js';
-	import { toStardate } from '$lib/stardate.js';
+	import { randomQuote, toStardate } from '$lib/trekEphemera.js';
 
 	let kIndexData = [];
 	let solarFluxData = [];
@@ -17,7 +16,8 @@
 	let outcome = 'FAVORABLE';
 	let qapla = 'Qapla!';
 
-	let quote = 'Live long and prosper';
+	let quote = randomQuote();
+	let stardate = toStardate();
 
 	onMount(async () => {
 		try {
@@ -31,8 +31,6 @@
 
 			solarFluxData = await fRes.json();
 			currentSolarFlux = solarFluxData.at(-1).flux;
-			quote = randomQuote();
-			stardate = toStardate();
 		} catch (e) {
 			console.error(e);
 		} finally {
@@ -62,7 +60,7 @@
 					-->
 					<!-- <button onclick="playSoundAndRedirect('audio2', '#')" class="panel-1-button">LCARS</button> -->
 					<div class="panel-2">
-						<!-- <span class="hop quote"> {stardate}</span> -->
+						<span class="hop quote">STARDATE <br />{stardate}</span>
 					</div>
 				</div>
 
