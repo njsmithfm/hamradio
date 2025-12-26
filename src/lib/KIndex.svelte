@@ -84,7 +84,7 @@
 					<g transform={`translate(${xScale(t)},0)`}>
 						<line y2={height} />
 						<text x="25" y="35" text-anchor="middle" font-size="6" fill="#ffffff">
-							{d3.timeFormat('%b %d')(t)}
+							{d3.timeFormat('%H:%M')(t)}
 						</text>
 					</g>
 				{/each}

@@ -92,7 +92,7 @@
 							</nav>
 							<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
 						</div>
-						<p class="quote">{quote}</p>
+						<p style="text-align:right" class="quote">{quote}</p>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
@@ -162,9 +162,8 @@
 											{/if}
 										</h4>
 										<KIndex data={kIndexData} />
-										<h4>
+										<!-- <h4>
 											A‑Index:
-											<!-- {currentAIndex}, -->
 											{#if currentAIndex <= 100}
 												Quiet
 											{:else if currentAIndex <= 200}
@@ -173,7 +172,7 @@
 												Storm
 											{/if}
 										</h4>
-										<AIndex data={aIndexData} />
+										<AIndex data={aIndexData} /> -->
 									</div>
 
 									<div class="card">

@@ -9,10 +9,10 @@ export const quotes = [
 	'Openness, optimism and the spirit of curiosity',
 	'Things are only impossible until they are not',
 	'It is the unknown that defines our existence',
-	'Vamoose ya little varmint',
 	'The glory of creation is in its infinite diversity',
 	'Jolan tru',
-	'Voka a Bentel'
+	'Voka a Bentel',
+	'Change is the essential process of all existence'
 ];
 
 export function randomQuote() {
