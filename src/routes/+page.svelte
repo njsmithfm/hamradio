@@ -31,7 +31,7 @@
 				aRes, // predicted_fredericksburg_a_index.json
 				fRes // f107_cm_flux.json
 			] = await Promise.all([
-				fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json'),
+				fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
 				fetch('https://services.swpc.noaa.gov/json/predicted_fredericksburg_a_index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
@@ -42,7 +42,7 @@
 			solarFluxData = await fRes.json();
 
 			// Pull the latest values (optional, for the dashboard cards)
-			currentKIndex = kIndexData.at(-1).kp_index;
+			currentKIndex = kIndexData.at(-1)[1]; // Kp value is in column 1
 			currentAIndex = aIndexData.at(-1).a; // field name in the 1‑min feed
 			currentSolarFlux = solarFluxData.at(-1).flux;
 		} catch (e) {
@@ -92,7 +92,7 @@
 							</nav>
 							<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
 						</div>
-						<p style="text-align:right" class="quote">{quote}</p>
+						<!-- <p style="text-align:right" class="quote">{quote}</p> -->
 					</div>
 
 					<div class="bar-panel first-bar-panel">
