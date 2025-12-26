@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import KIndex from '$lib/KIndex.svelte';
 
-	import AIndex from '$lib/AIndex.svelte';
 	import SolarFlux from '$lib/SolarFlux.svelte';
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
@@ -11,10 +10,8 @@
 	import { randomQuote, toStardate } from '$lib/trekEphemera.js';
 
 	let kIndexData = [];
-	let aIndexData = 0;
 	let solarFluxData = [];
 	let currentKIndex = 0;
-	let currentAIndex = 0;
 	let currentSolarFlux = 0;
 	let loading = true;
 	let outcome = 'FAVORABLE';
@@ -28,22 +25,18 @@
 			// Order matters – the array indices must line‑up with the variables
 			const [
 				kRes, // planetary_k_index_1m.json
-				aRes, // predicted_fredericksburg_a_index.json
 				fRes // f107_cm_flux.json
 			] = await Promise.all([
 				fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
-				fetch('https://services.swpc.noaa.gov/json/predicted_fredericksburg_a_index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
 
 			// Parse each response
 			kIndexData = await kRes.json();
-			aIndexData = await aRes.json(); // ← now really the A‑Index feed
 			solarFluxData = await fRes.json();
 
 			// Pull the latest values (optional, for the dashboard cards)
 			currentKIndex = kIndexData.at(-1)[1]; // Kp value is in column 1
-			currentAIndex = aIndexData.at(-1).a; // field name in the 1‑min feed
 			currentSolarFlux = solarFluxData.at(-1).flux;
 		} catch (e) {
 			console.error('Failed to load space‑weather data:', e);
@@ -92,7 +85,7 @@
 							</nav>
 							<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
 						</div>
-						<!-- <p style="text-align:right" class="quote">{quote}</p> -->
+						<p style="text-align:right" class="quote">{quote}</p>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
@@ -162,17 +155,6 @@
 											{/if}
 										</h4>
 										<KIndex data={kIndexData} />
-										<!-- <h4>
-											A‑Index:
-											{#if currentAIndex <= 100}
-												Quiet
-											{:else if currentAIndex <= 200}
-												Unsettled
-											{:else}
-												Storm
-											{/if}
-										</h4>
-										<AIndex data={aIndexData} /> -->
 									</div>
 
 									<div class="card">

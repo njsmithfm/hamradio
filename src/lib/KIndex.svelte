@@ -78,8 +78,17 @@
 			.selectAll('text')
 			.style('font-size', '12px')
 			.style('fill', '#ffffff');
+		// Area fill
+		const area = d3
+			.area()
+			.x((d) => x(d.time))
+			.y0(innerH)
+			.y1((d) => y(d.value))
+			.curve(d3.curveMonotoneX);
 
-		// Line
+		svg.append('path').datum(recent).attr('fill', 'rgba(37,99,235,0.2)').attr('d', area);
+
+		// Line (existing code)
 		const line = d3
 			.line()
 			.x((d) => x(d.time))
@@ -93,7 +102,6 @@
 			.attr('stroke', '#2563eb')
 			.attr('stroke-width', 2)
 			.attr('d', line);
-
 		// Data points
 		svg
 			.selectAll('.dot')
