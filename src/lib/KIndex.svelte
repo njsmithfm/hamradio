@@ -63,19 +63,14 @@
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${innerH})`)
-			.call(d3.axisBottom(x).ticks(8).tickFormat(d3.timeFormat('%m/%d %H:%M')))
+			.call(d3.axisBottom(x).ticks(8).tickFormat(d3.timeFormat('%m/%d')))
 			.selectAll('text')
 			.style('font-size', '10px')
 			.attr('transform', 'rotate(-45)')
 			.style('text-anchor', 'end');
 
 		// Y-axis
-		svg
-			.append('g')
-			.call(d3.axisLeft(y).ticks(10))
-			.selectAll('text')
-			.style('font-size', '12px')
-			.style('fill', '#ffffff');
+		svg.append('g').call(d3.axisLeft(y).ticks(10)).selectAll('text').style('font-size', '12px');
 		// Area fill
 		const area = d3
 			.area()

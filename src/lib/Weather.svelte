@@ -134,9 +134,4 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
 	}
-
-	/* optional: keep the existing styling for each panel */
-	.current-panel,
-	.forecast-panel {
-	}
 </style>

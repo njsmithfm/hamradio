@@ -83,9 +83,14 @@
 									Earth Weather
 								</button>
 							</nav>
-							<div class="banner">ROCHESTER MN &#149 LCARS V. 24.2</div>
+
+							<div class="banner">ROCHESTER MN</div>
+							<div class="title‑wrapper">
+								<div style="text-align:right; font-size:2rem">LCARS V. 24.2</div>
+
+								<p style="text-align:right" class="quote">{quote}</p>
+							</div>
 						</div>
-						<p style="text-align:right" class="quote">{quote}</p>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
@@ -187,7 +192,6 @@
 										<Map />
 									</div>
 									<div class="card wide">
-										<h4>Local Weather</h4>
 										<Weather />
 									</div>
 								</div>
@@ -220,8 +224,25 @@
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
+
+	/* 1️⃣ make the wrapper the positioning context */
+	.title‑wrapper {
+		align-items: center; /* vertically centre */
+		gap: 0.5rem; /* small space between title & quote */
+	}
+
+	/* 2️⃣ pull the quote out of the normal flow */
 	.quote {
+		position: absolute; /* ← removes it from layout */
+		right: 0; /* stick to the right edge of the wrapper */
+		top: 50%; /* centre vertically */
+		transform: translateY(-50%);
+		margin: 0; /* reset default <p> margins */
 		font-size: 0.85rem;
 		color: #89f;
+		white-space: nowrap; /* keep it on one line */
+		overflow: hidden;
+		text-overflow: ellipsis; /* truncate if it gets too long */
+		max-width: 40%; /* limit width so it never forces the title wider */
 	}
 </style>
