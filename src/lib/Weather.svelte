@@ -8,6 +8,10 @@
 	let forecast = null;
 	let loading = true;
 
+	function fToC(f) {
+		return Math.round(((f - 32) * 5) / 9);
+	}
+
 	onMount(async () => {
 		try {
 			// First, get the grid point data
@@ -18,9 +22,17 @@
 			const forecastResponse = await fetch(pointData.properties.forecast);
 			const forecastData = await forecastResponse.json();
 
-			// Get current conditions from the first period
-			weather = forecastData.properties.periods[0];
-			forecast = forecastData.properties.periods.slice(0, 3);
+			const cur = forecastData.properties.periods[0];
+			weather = {
+				...cur,
+				tempC: fToC(cur.temperature) // ← Celsius version
+			};
+
+			// next three periods
+			forecast = forecastData.properties.periods.slice(0, 3).map((p) => ({
+				...p,
+				tempC: fToC(p.temperature) // ← Celsius version
+			}));
 		} catch (error) {
 			console.error('Error fetching weather:', error);
 		} finally {
@@ -33,40 +45,47 @@
 	{#if loading}
 		<p>Loading weather...</p>
 	{:else if weather}
-		<div class="current-weather">
-			<h3>Current Conditions</h3>
-			<div class="weather-main">
-				<div class="temp">{weather.temperature}°{weather.temperatureUnit}</div>
-				<div class="conditions">{weather.shortForecast}</div>
-			</div>
-			<div class="details">
-				<p><strong>Wind:</strong> {weather.windSpeed} {weather.windDirection}</p>
-				<p><strong>Forecast:</strong> {weather.detailedForecast}</p>
-			</div>
+		<div class="panels">
+			<section class="current-panel">
+				<!-- current‑conditions markup (unchanged) -->
 
-			<!-- HAM Radio Impact -->
-			<div class="ham-impact">
-				<strong>Radio Impact:</strong>
-				{#if weather.shortForecast.toLowerCase().includes('storm') || weather.shortForecast
-						.toLowerCase()
-						.includes('thunder')}
-					Thunderstorms can cause high noise levels and static
-				{:else if weather.windSpeed.includes('30') || weather.windSpeed.includes('40')}
-					High winds - secure antennas
-				{:else}
-					Weather conditions favorable
-				{/if}
-			</div>
-		</div>
+				<div class="current-weather">
+					<h3>Current Conditions</h3>
+					<div class="weather-main">
+						<div class="temp">{weather.tempC}°C</div>
+						<div class="conditions">{weather.shortForecast}</div>
+					</div>
 
-		<div class="forecast-periods">
-			<h3>Short-term Forecast</h3>
-			{#each forecast as period}
-				<div class="period">
-					<strong>{period.name}:</strong>
-					{period.temperature}°{period.temperatureUnit}, {period.shortForecast}
+					<!-- HAM Radio Impact -->
+					<div class="ham-impact">
+						<strong>Radio Impact:</strong>
+						{#if weather.shortForecast.toLowerCase().includes('storm') || weather.shortForecast
+								.toLowerCase()
+								.includes('thunder')}
+							Thunderstorms can cause high noise levels and static
+						{:else if weather.windSpeed.includes('30') || weather.windSpeed.includes('40')}
+							High winds - secure antennas
+						{:else}
+							Weather conditions favorable
+						{/if}
+					</div>
 				</div>
-			{/each}
+			</section>
+
+			<section class="forecast-panel">
+				<div class="forecast-periods">
+					<h3>Short-term Forecast</h3>
+					{#each forecast as period}
+						<div class="period">
+							<strong>{period.name}:</strong>
+							<div style="color: #2563eb; display: inline-block">
+								{period.tempC}°C
+							</div>
+							{period.shortForecast}
+						</div>
+					{/each}
+				</div>
+			</section>
 		</div>
 	{:else}
 		<p>Unable to load weather data</p>
@@ -99,33 +118,25 @@
 		font-size: 1.5rem;
 	}
 
-	.details {
-		background: #f0f4ff;
-		padding: 1rem;
-		border-radius: 6px;
-		margin: 1rem 0;
-	}
-
-	.details p {
-		margin: 0.5rem 0;
-	}
-
 	.ham-impact {
-		background: #fef3c7;
 		border-left: 4px solid #f59e0b;
 		padding: 1rem;
 		margin-top: 1rem;
 	}
 
-	.forecast-periods {
-		border-top: 2px solid #e5e7eb;
-		padding-top: 1rem;
+	.period {
+		border-radius: 4px;
 	}
 
-	.period {
-		padding: 0.75rem;
-		background: #f9fafb;
-		margin: 0.5rem 0;
-		border-radius: 4px;
+	/* two‑column layout below the hero */
+	.panels {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
+	/* optional: keep the existing styling for each panel */
+	.current-panel,
+	.forecast-panel {
 	}
 </style>

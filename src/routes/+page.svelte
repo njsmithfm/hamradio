@@ -67,7 +67,7 @@
 					-->
 					<!-- <button onclick="playSoundAndRedirect('audio2', '#')" class="panel-1-button">LCARS</button> -->
 					<div class="panel-2">
-						<span class="hop quote">STARDATE <br />{stardate}</span>
+						<span class="hop">STARDATE <br />{stardate}</span>
 					</div>
 				</div>
 
@@ -76,7 +76,7 @@
 						<div class="nav-row">
 							<nav class="tab-bar">
 								<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
-									Space Weather
+									Space Weather
 								</button>
 
 								<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
@@ -141,7 +141,7 @@
 								<div class="card">
 									<h2>
 										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
-										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
+										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
 									</h2>
 									<div class="card wide">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
@@ -180,7 +180,7 @@
 								<div class="card">
 									<h2>
 										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
-										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
+										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
 									</h2>
 
 									<div class="card wide">
@@ -222,5 +222,6 @@
 	}
 	.quote {
 		font-size: 0.85rem;
+		color: #89f;
 	}
 </style>
