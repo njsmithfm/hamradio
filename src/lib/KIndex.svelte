@@ -7,10 +7,10 @@
 	let tooltip;
 
 	const margin = { top: 20, right: 20, bottom: 50, left: 50 };
-	const visibleR = 4;
+	const visibleR = 6;
 	const hoverBuffer = 3;
 
-	const color = d3.scaleLinear().domain([0, 5, 9]).range(['#00ff00', '#ffff00', '#ff0000']);
+	const color = d3.scaleLinear().domain([0, 5, 9]).range(['#a1d76a', '#e9a3c9', '#ff0000']);
 
 	let containerW = 0;
 	let containerH = 0;
@@ -29,7 +29,6 @@
 	$: if (data?.length && containerW && containerH) drawChart();
 
 	function drawChart() {
-		// Parse CSV-style data (skip header row)
 		const recent = data
 			.slice(1)
 			.map((row) => ({
@@ -67,7 +66,6 @@
 			.call(d3.axisBottom(x).ticks(8).tickFormat(d3.timeFormat('%m/%d %H:%M')))
 			.selectAll('text')
 			.style('font-size', '10px')
-			.style('fill', '#ffffff')
 			.attr('transform', 'rotate(-45)')
 			.style('text-anchor', 'end');
 

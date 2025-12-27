@@ -7,7 +7,7 @@
 	let tooltip;
 
 	const margin = { top: 20, right: 20, bottom: 50, left: 50 };
-	const visibleR = 7;
+	const visibleR = 6;
 	const hoverBuffer = 3;
 	const maxPoints = 30;
 
@@ -130,9 +130,6 @@
 			.style('fill', 'transparent')
 			.style('pointer-events', 'all');
 
-		// -------------------------------------------------
-		// Overlay mouse events (Solar‑Flux)
-		// -------------------------------------------------
 		overlay
 			.on('mouseover', (_, d) => {
 				tooltip.innerHTML = `

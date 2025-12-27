@@ -143,7 +143,10 @@
 										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
 										{#if outcome == 'FAVORABLE'}QAPLA!{/if}
 									</h2>
-									<div class="card wide chart-row">
+									<div class="card wide">
+										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
+									</div>
+									<div class="card">
 										<h4>
 											K‑Index: {currentKIndex},
 											{#if currentKIndex <= 3}
@@ -169,10 +172,6 @@
 											{/if}
 										</h4>
 										<SolarFlux data={solarFluxData} />
-									</div>
-
-									<div class="card wide">
-										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
 								</div>
 							</div>
@@ -211,11 +210,6 @@
 {/if}
 
 <style>
-	.chart-row {
-		display: flex;
-		gap: 1rem;
-		align-items: flex-start;
-	}
 	.nav-row {
 		margin: 1rem;
 		display: flex;
