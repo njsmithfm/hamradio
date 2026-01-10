@@ -1,35 +1,45 @@
 <script>
 	import { onMount } from 'svelte';
 	import KIndex from '$lib/KIndex.svelte';
+
 	import SolarFlux from '$lib/SolarFlux.svelte';
 	import Bands from '$lib/Bands.svelte';
 	import Weather from '$lib/Weather.svelte';
 	import Map from '$lib/Map.svelte';
-	import { randomQuote } from '$lib/quotes.js';
+	import Sun from '$lib/Sun.svelte';
+	import { randomQuote, toStardate } from '$lib/trekEphemera.js';
 
 	let kIndexData = [];
 	let solarFluxData = [];
 	let currentKIndex = 0;
 	let currentSolarFlux = 0;
 	let loading = true;
+	let outcome = 'FAVORABLE';
+	let activeTab = 0;
 
-	let quote = 'Live long and prosper';
+	let quote = randomQuote();
+	let stardate = toStardate();
 
 	onMount(async () => {
 		try {
-			const [kRes, fRes] = await Promise.all([
-				fetch('https://services.swpc.noaa.gov/json/planetary_k_index_1m.json'),
+			// Order matters – the array indices must line‑up with the variables
+			const [
+				kRes, // planetary_k_index_1m.json
+				fRes // f107_cm_flux.json
+			] = await Promise.all([
+				fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
 
+			// Parse each response
 			kIndexData = await kRes.json();
-			currentKIndex = kIndexData.at(-1).kp_index;
-
 			solarFluxData = await fRes.json();
+
+			// Pull the latest values (optional, for the dashboard cards)
+			currentKIndex = kIndexData.at(-1)[1]; // Kp value is in column 1
 			currentSolarFlux = solarFluxData.at(-1).flux;
-			quote = randomQuote();
 		} catch (e) {
-			console.error(e);
+			console.error('Failed to load space‑weather data:', e);
 		} finally {
 			loading = false;
 		}
@@ -56,17 +66,36 @@
 					</div>
 					-->
 					<!-- <button onclick="playSoundAndRedirect('audio2', '#')" class="panel-1-button">LCARS</button> -->
-					<div class="panel-2">02<span class="hop">-262000</span></div>
+					<div class="panel-2">
+						<span class="hop">STARDATE <br />{stardate}</span>
+					</div>
 				</div>
-				<div class="right-frame-top">
-					<div class="banner">
-						ROCHESTER MN &#149 LCARS V. 24.2
 
-						<p class="go-big">{quote}</p>
+				<div class="right-frame-top">
+					<div>
+						<div class="nav-row">
+							<nav class="tab-bar">
+								<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
+									Space Weather
+								</button>
+
+								<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
+									Earth Weather
+								</button>
+							</nav>
+
+							<div class="banner">ROCHESTER MN</div>
+							<div class="title‑wrapper">
+								<div style="text-align:right; font-size:2rem">LCARS V. 24.2</div>
+
+								<p style="text-align:right" class="quote">{quote}</p>
+							</div>
+						</div>
 					</div>
 
 					<div class="bar-panel first-bar-panel">
 						<div class="bar-1"></div>
+
 						<div class="bar-2"></div>
 						<div class="bar-3"></div>
 						<div class="bar-4"></div>
@@ -76,26 +105,31 @@
 			</div>
 			<div class="wrap" id="gap">
 				<div class="left-frame">
-					<!--
-					** SCROLL TO TOP OF PAGE BUTTON **
-					This button is initially hidden, and is styled like a panel in the sidebar. It appears at the bottom of the page after vertical scrolling. If you don't want the sound effect, replace with this:
+					<!-- ** SCROLL TO TOP OF PAGE BUTTON ** This button is initially hidden, and is styled like a
+					panel in the sidebar. It appears at the bottom of the page after vertical scrolling. If
+					you don't want the sound effect, replace with this:
 					<button onclick="topFunction()" id="topBtn"><span class="hop">screen</span> top</button>
-					-->
-					<!-- <button onclick="topFunction(); playSoundAndRedirect('audio4', '#')" id="topBtn"> -->
 
-					<!-- <span class="hop">screen</span> top</button> -->
+					<button onclick="topFunction(); playSoundAndRedirect('audio4', '#')" id="topBtn"> -->
+					<!-- <span class="hop">screen</span> top</button
+					> -->
 
 					<div>
-						<div class="panel-3">03<span class="hop">-111968</span></div>
-						<div class="panel-4">04<span class="hop">-041969</span></div>
-						<div class="panel-5">05<span class="hop">-1701D</span></div>
-						<div class="panel-6">06<span class="hop">-071984</span></div>
-						<div class="panel-7">07<span class="hop">-081940</span></div>
-						<div class="panel-8">08<span class="hop">-47148</span></div>
-						<div class="panel-9">09<span class="hop">-081966</span></div>
+						<div class="panel-3">04<span class="hop">-111968</span></div>
+						<div class="panel-4">08<span class="hop">-041969</span></div>
+						<div class="panel-5">15<span class="hop">-1701D</span></div>
+						<div class="panel-6">16<span class="hop">-071984</span></div>
+						<div class="panel-7">23<span class="hop">-081940</span></div>
+						<div class="panel-8">42<span class="hop">-47148</span></div>
 					</div>
 					<div>
-						<div class="panel-10">10<span class="hop">-31</span></div>
+						<div class="panel-10">
+							<span class="hop"
+								><a class="njsmithfm" href="https://njsmithfm.github.io" target="_blank"
+									>njsmith.fm</a
+								></span
+							>
+						</div>
 					</div>
 				</div>
 				<div class="right-frame">
@@ -107,61 +141,62 @@
 						<div class="bar-10"></div>
 					</div>
 					<main>
-						<!-- Start your content here. -->
-
-						<div class="dashboard-grid">
-							<!-- Top metrics -->
-							<div class="card wide">
-								<h2>IONOSPHERIC QUANTA</h2>
-								<div class="metrics-row">
-									<div class="metric">
-										<div class="metric-label">K-Index</div>
-										<div class="metric-value">{currentKIndex}</div>
-										<div class="metric-status">
-											{currentKIndex <= 3 ? 'Quiet' : currentKIndex <= 5 ? 'Unsettled' : 'Storm'}
-										</div>
+						{#if activeTab === 0}
+							<div class="dashboard-grid">
+								<div class="card">
+									<h2>
+										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
+										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
+									</h2>
+									<div class="card wide">
+										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
-									<div class="metric">
-										<div class="metric-label">SFU</div>
-										<div class="metric-value">{currentSolarFlux.toFixed(0)}</div>
-										<div class="metric-status">
-											{currentSolarFlux > 150
-												? 'Excellent'
-												: currentSolarFlux > 100
-													? 'Good'
-													: 'Fair'}
-										</div>
+									<div class="card">
+										<h4>
+											K‑Index: {currentKIndex},
+											{#if currentKIndex <= 3}
+												Quiet
+											{:else if currentKIndex <= 5}
+												Unsettled
+											{:else}
+												Storm
+											{/if}
+										</h4>
+										<KIndex data={kIndexData} />
+									</div>
+
+									<div class="card">
+										<h4>
+											Solar Flux Units: {currentSolarFlux.toFixed(0)},
+											{#if currentSolarFlux > 150}
+												Optimal
+											{:else if currentSolarFlux > 100}
+												Adequate
+											{:else}
+												Fair
+											{/if}
+										</h4>
+										<SolarFlux data={solarFluxData} />
 									</div>
 								</div>
 							</div>
+						{:else}
+							<div class="dashboard-grid">
+								<div class="card">
+									<h2>
+										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
+										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
+									</h2>
 
-							<!-- Charts -->
-							<div class="card">
-								<h2>K-Index Trend</h2>
-								<KIndex data={kIndexData} />
+									<div class="card wide">
+										<Map />
+									</div>
+									<div class="card wide">
+										<Weather />
+									</div>
+								</div>
 							</div>
-
-							<div class="card">
-								<h2>SFU (30 Days)</h2>
-								<SolarFlux data={solarFluxData} />
-							</div>
-
-							<!-- Band Conditions -->
-							<div class="card wide">
-								<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
-							</div>
-
-							<div class="card wide">
-								<Map />
-							</div>
-							<!-- Weather -->
-							<div class="card wide">
-								<h2>Local Weather</h2>
-								<Weather />
-							</div>
-						</div>
-
-						<!-- End content area. -->
+						{/if}
 					</main>
 					<footer>
 						<!-- Your copyright information is only a suggestion and you can choose to delete it. -->
@@ -175,4 +210,39 @@
 		</section>
 		<div class="headtrim"></div>
 		<div class="baseboard"></div>
-	</div>{/if}
+	</div>
+{/if}
+
+<style>
+	.nav-row {
+		margin: 1rem;
+		display: flex;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+
+	.njsmithfm:hover {
+		color: rgb(255, 0, 212);
+	}
+
+	/* 1️⃣ make the wrapper the positioning context */
+	.title‑wrapper {
+		align-items: center; /* vertically centre */
+		gap: 0.5rem; /* small space between title & quote */
+	}
+
+	/* 2️⃣ pull the quote out of the normal flow */
+	.quote {
+		position: absolute; /* ← removes it from layout */
+		right: 0; /* stick to the right edge of the wrapper */
+		top: 50%; /* centre vertically */
+		transform: translateY(-50%);
+		margin: 0; /* reset default <p> margins */
+		font-size: 0.85rem;
+		color: #89f;
+		white-space: nowrap; /* keep it on one line */
+		overflow: hidden;
+		text-overflow: ellipsis; /* truncate if it gets too long */
+		max-width: 40%; /* limit width so it never forces the title wider */
+	}
+</style>
