@@ -85,7 +85,8 @@
 							</nav>
 
 							<div class="banner">ROCHESTER MN</div>
-							<div class="title‑wrapper">
+
+							<div class="title-wrapper">
 								<div style="text-align:left; font-size:1.5rem">LCARS V. 24.2</div>
 								<p class="quote">{quote}</p>
 							</div>
@@ -213,7 +214,7 @@
 		color: rgb(255, 0, 212);
 	}
 
-	.title‑wrapper {
+	.title-wrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
