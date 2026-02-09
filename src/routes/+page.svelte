@@ -104,15 +104,6 @@
 			</div>
 			<div class="wrap" id="gap">
 				<div class="left-frame">
-					<!-- ** SCROLL TO TOP OF PAGE BUTTON ** This button is initially hidden, and is styled like a
-					panel in the sidebar. It appears at the bottom of the page after vertical scrolling. If
-					you don't want the sound effect, replace with this:
-					<button onclick="topFunction()" id="topBtn"><span class="hop">screen</span> top</button>
-
-					<button onclick="topFunction(); playSoundAndRedirect('audio4', '#')" id="topBtn"> -->
-					<!-- <span class="hop">screen</span> top</button
-					> -->
-
 					<div>
 						<div class="panel-3">04<span class="hop">-111968</span></div>
 						<div class="panel-4">08<span class="hop">-041969</span></div>
@@ -198,8 +189,6 @@
 						{/if}
 					</main>
 					<footer>
-						<!-- Your copyright information is only a suggestion and you can choose to delete it. -->
-
 						<!-- The following attribution must not be removed: -->
 						LCARS Inspired Website Template by
 						<a href="https://www.thelcars.com">www.TheLCARS.com</a>.
@@ -223,23 +212,20 @@
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
-	/* 1️⃣ Stack the children vertically and left‑align them */
+
 	.title‑wrapper {
 		display: flex;
-		flex-direction: column; /* stack heading → quote */
-		align-items: flex-start; /* left‑align each child */
-		gap: 0.4rem; /* space between heading and quote */
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.2rem; /* space between heading and quote */
 	}
 
-	/* 2️⃣ Quote returns to normal flow (no absolute positioning) */
 	.quote {
-		position: static; /* or just delete the whole position rule */
-		margin: 0; /* keep the reset you already had */
+		margin: 0;
 		font-size: 0.85rem;
 		color: #89f;
-		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 100%; /* let it use the wrapper’s width */
+		max-width: 100%;
 	}
 </style>
