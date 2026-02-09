@@ -86,9 +86,8 @@
 
 							<div class="banner">ROCHESTER MN</div>
 							<div class="title‑wrapper">
-								<div style="text-align:right; font-size:2rem">LCARS V. 24.2</div>
-
-								<p style="text-align:right" class="quote">{quote}</p>
+								<div style="text-align:left; font-size:1.5rem">LCARS V. 24.2</div>
+								<p class="quote">{quote}</p>
 							</div>
 						</div>
 					</div>
@@ -224,25 +223,23 @@
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
-
-	/* 1️⃣ make the wrapper the positioning context */
+	/* 1️⃣ Stack the children vertically and left‑align them */
 	.title‑wrapper {
-		align-items: center; /* vertically centre */
-		gap: 0.5rem; /* small space between title & quote */
+		display: flex;
+		flex-direction: column; /* stack heading → quote */
+		align-items: flex-start; /* left‑align each child */
+		gap: 0.4rem; /* space between heading and quote */
 	}
 
-	/* 2️⃣ pull the quote out of the normal flow */
+	/* 2️⃣ Quote returns to normal flow (no absolute positioning) */
 	.quote {
-		position: absolute; /* ← removes it from layout */
-		right: 0; /* stick to the right edge of the wrapper */
-		top: 50%; /* centre vertically */
-		transform: translateY(-50%);
-		margin: 0; /* reset default <p> margins */
+		position: static; /* or just delete the whole position rule */
+		margin: 0; /* keep the reset you already had */
 		font-size: 0.85rem;
 		color: #89f;
-		white-space: nowrap; /* keep it on one line */
+		white-space: nowrap;
 		overflow: hidden;
-		text-overflow: ellipsis; /* truncate if it gets too long */
-		max-width: 40%; /* limit width so it never forces the title wider */
+		text-overflow: ellipsis;
+		max-width: 100%; /* let it use the wrapper’s width */
 	}
 </style>

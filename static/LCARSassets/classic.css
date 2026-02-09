@@ -257,6 +257,8 @@ body	{
 	color: var(--font-color);
 }
 
+
+
 a	{
 	text-decoration: underline;
 	text-decoration-thickness: 2px;
@@ -1002,13 +1004,17 @@ button:active {
 	text-align: right;
 	text-transform: uppercase;
 	line-height: 1.1;
-	font-size: clamp(1.25rem, 0.75rem + 4vw, 4rem);
+	font-size: clamp(1.25rem, 0.75rem + 4vw, 3.5rem);
 	color: var(--banner-color);
 }
 
 .banner a {
 	color: var(--banner-color);
 	text-decoration: none;
+}
+
+.banner.title-wrapper {
+	
 }
 
 .data-cascade-button-group	{
