@@ -2,7 +2,6 @@
 	export let solarFlux = 0;
 	export let kIndex = 0;
 
-	// Calculate band conditions based on solar flux and K-index
 	const bands = [
 		{ name: '160m', freq: '1.8-2.0 MHz', nightBand: true },
 		{ name: '80m', freq: '3.5-4.0 MHz', nightBand: true },
