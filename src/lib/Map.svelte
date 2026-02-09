@@ -45,46 +45,26 @@
 			ext: 'png'
 		});
 
-		const precipLayer = L.tileLayer(PRECIP_URL, {
-			opacity: 1,
-			attribution: PRECIP_ATTRIB,
-			maxZoom: 20
-		});
-		const tempLayer = L.tileLayer(TEMP_URL, {
-			opacity: 0.35,
-			attribution: TEMP_ATTRIB,
-			maxZoom: 20
-		});
-		const cloudLayer = L.tileLayer(CLOUD_URL, {
-			opacity: 1,
-			attribution: CLOUD_ATTRIB,
-			maxZoom: 20
-		});
-
-		const windLayer = L.tileLayer(WIND_URL, {
-			opacity: 1,
-			attribution: WIND_ATTRIB,
-			maxZoom: 20
-		});
+		const radarLayer = L.tileLayer(
+			'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png',
+			{
+				attribution: 'NOAA/NWS Radar',
+				opacity: 0.6,
+				maxZoom: 20
+			}
+		);
 
 		const map = L.map(mapDiv, {
 			center: [44.0121, -92.4802],
-			zoom: 10,
-			layers: [baseLayer, precipLayer, tempLayer, cloudLayer, windLayer]
+			zoom: 8, // Good view of Rochester area
+			layers: [baseLayer, radarLayer]
 		});
 
 		const overlays = {
-			Precipitation: precipLayer,
-			Temperature: tempLayer,
-			Clouds: cloudLayer,
-			Wind: windLayer
+			'Weather Radar': radarLayer
 		};
-		L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
-		precipLayer.bringToFront();
-		tempLayer.bringToFront();
-		cloudLayer.bringToFront();
-		windLayer.bringToFront();
+		L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 	});
 </script>
 
@@ -95,5 +75,7 @@
 	.leaflet-container {
 		width: 100%;
 		height: 500px;
+		min-height: 400px;
+		height: 50vh;
 	}
 </style>

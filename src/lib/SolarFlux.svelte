@@ -171,6 +171,7 @@
 		width: 100%;
 		height: 45vh;
 		min-height: 250px;
+		overflow: visible; /* ADD THIS */
 	}
 
 	:global(.chart-svg) {

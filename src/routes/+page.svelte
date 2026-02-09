@@ -229,4 +229,25 @@
 		text-overflow: ellipsis;
 		max-width: 100%;
 	}
+
+	.dashboard-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.card {
+		background: rgba(0, 0, 0, 0.3);
+		padding: 1.5rem;
+		border-radius: 8px;
+	}
+
+	.card.wide {
+		width: 100%;
+	}
+
+	.card h2,
+	.card h4 {
+		margin-top: 0;
+	}
 </style>
