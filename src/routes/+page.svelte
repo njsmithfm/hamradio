@@ -36,7 +36,7 @@
 			solarFluxData = await fRes.json();
 
 			// Pull the latest values (optional, for the dashboard cards)
-			currentKIndex = kIndexData.at(-1)[1]; // Kp value is in column 1
+			currentKIndex = kIndexData.at(-1)[1];
 			currentSolarFlux = solarFluxData.at(-1).flux;
 		} catch (e) {
 			console.error('Failed to load space‑weather data:', e);
