@@ -30,13 +30,15 @@
 
 	function drawChart() {
 		const recent = data
-			.slice(1)
-			.map((row) => ({
-				time: new Date(row[0]),
-				value: +row[1]
-			}))
-			.filter((d) => !isNaN(d.value));
-
+			.slice(1) // Skip header/first row
+			.map((row) => {
+				// Your data uses 'time_tag' for time and 'Kp' for the value
+				return {
+					time: new Date(row.time_tag),
+					value: parseFloat(row.Kp)
+				};
+			})
+			.filter((d) => !isNaN(d.value) && !isNaN(d.time.getTime()));
 		if (!recent.length) return;
 
 		const innerW = containerW - margin.left - margin.right;
