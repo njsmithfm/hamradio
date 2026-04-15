@@ -20,6 +20,26 @@
 	let quote = randomQuote();
 	let stardate = toStardate();
 
+	let audio1;
+	let audio2;
+	let audio3;
+	let audio4;
+
+	function playBeep(audio) {
+		if (!audio) return;
+		audio.pause();
+		audio.currentTime = 0;
+		audio.play().catch(() => {});
+	}
+
+	function playTabBeep() {
+		playBeep(audio1);
+	}
+
+	function playPanelBeep() {
+		playBeep(audio2);
+	}
+
 	onMount(async () => {
 		try {
 			// Order matters – the array indices must line‑up with the variables
@@ -50,10 +70,10 @@
 	<p>Loading space‑weather data…</p>
 {:else}
 	<div class="dashboard-grid">
-		<audio id="audio1" src="/LCARSassets/beep1.mp3" preload="auto"></audio>
-		<audio id="audio2" src="/LCARSassets/beep2.mp3" preload="auto"></audio>
-		<audio id="audio3" src="/LCARSassets/beep3.mp3" preload="auto"></audio>
-		<audio id="audio4" src="/LCARSassets/beep4.mp3" preload="auto"></audio>
+		<audio bind:this={audio1} src="/LCARSassets/beep1.mp3" preload="auto"></audio>
+		<audio bind:this={audio2} src="/LCARSassets/beep2.mp3" preload="auto"></audio>
+		<audio bind:this={audio3} src="/LCARSassets/beep3.mp3" preload="auto"></audio>
+		<audio bind:this={audio4} src="/LCARSassets/beep4.mp3" preload="auto"></audio>
 		<section class="wrap-standard" id="column-3">
 			<div class="wrap">
 				<div class="left-frame-top">
@@ -75,11 +95,23 @@
 					<div>
 						<div class="nav-row">
 							<nav class="tab-bar">
-								<button class:selected={activeTab === 0} on:click={() => (activeTab = 0)}>
+								<button
+									class:selected={activeTab === 0}
+									on:click={() => {
+										activeTab = 0;
+										playTabBeep();
+									}}
+								>
 									Space Weather
 								</button>
 
-								<button class:selected={activeTab === 1} on:click={() => (activeTab = 1)}>
+								<button
+									class:selected={activeTab === 1}
+									on:click={() => {
+										activeTab = 1;
+										playTabBeep();
+									}}
+								>
 									Earth Weather
 								</button>
 							</nav>
