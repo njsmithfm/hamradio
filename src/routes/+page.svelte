@@ -16,6 +16,8 @@
 	let loading = true;
 	let hamRadioConditionsFavorable = false;
 	let hamRadioImpact = 'Loading weather impact...';
+	let chartEndTime;
+	let chartStartTime;
 	let activeTab = 0;
 
 	let quote = randomQuote();
@@ -75,6 +77,8 @@
 			// Parse each response
 			kIndexData = await kRes.json();
 			solarFluxData = await fRes.json();
+			chartEndTime = new Date();
+			chartStartTime = new Date(chartEndTime.getTime() - 72 * 60 * 60 * 1000);
 
 			// Pull the latest values (optional, for the dashboard cards)
 			currentKIndex = kIndexData.at(-1)[1];
@@ -83,6 +87,8 @@
 			console.error('Failed to load space‑weather data:', e);
 			hamRadioConditionsFavorable = false;
 			hamRadioImpact = 'Conditions are not favorable';
+			chartEndTime = new Date();
+			chartStartTime = new Date(chartEndTime.getTime() - 72 * 60 * 60 * 1000);
 		} finally {
 			loading = false;
 		}
@@ -203,31 +209,44 @@
 										<h4>
 											Radio Impact: {hamRadioImpact}
 										</h4>
-										<h4>
-											K‑Index: {currentKIndex},
-											{#if currentKIndex <= 3}
-												Quiet
-											{:else if currentKIndex <= 5}
-												Unsettled
-											{:else}
-												Storm
-											{/if}
-										</h4>
-										<KIndex data={kIndexData} />
 									</div>
 
-									<div class="card">
-										<h4>
-											Solar Flux Units: {currentSolarFlux.toFixed(0)},
-											{#if currentSolarFlux > 150}
-												Optimal
-											{:else if currentSolarFlux > 100}
-												Adequate
-											{:else}
-												Fair
-											{/if}
-										</h4>
-										<SolarFlux data={solarFluxData} />
+									<div class="charts-grid">
+										<div class="card">
+											<h4>
+												K‑Index: {currentKIndex},
+												{#if currentKIndex <= 3}
+													Quiet
+												{:else if currentKIndex <= 5}
+													Unsettled
+												{:else}
+													Storm
+												{/if}
+											</h4>
+											<KIndex
+												data={kIndexData}
+												xDomainStart={chartStartTime}
+												xDomainEnd={chartEndTime}
+											/>
+										</div>
+
+										<div class="card">
+											<h4>
+												Solar Flux Units: {currentSolarFlux.toFixed(0)},
+												{#if currentSolarFlux > 150}
+													Optimal
+												{:else if currentSolarFlux > 100}
+													Adequate
+												{:else}
+													Fair
+												{/if}
+											</h4>
+											<SolarFlux
+												data={solarFluxData}
+												xDomainStart={chartStartTime}
+												xDomainEnd={chartEndTime}
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -311,5 +330,18 @@
 	.card h2,
 	.card h4 {
 		margin-top: 0;
+	}
+
+	.charts-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	@media (min-width: 980px) {
+		.charts-grid {
+			grid-template-columns: 1fr 1fr;
+			align-items: stretch;
+		}
 	}
 </style>

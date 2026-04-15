@@ -39,9 +39,12 @@
 				time: new Date(d.time_tag),
 				flux: +d.flux
 			}))
-			.filter((d) => d.time <= new Date())
+			.filter((d) => !isNaN(d.flux) && !isNaN(d.time.getTime()) && d.time <= new Date())
 			.sort((a, b) => b.time - a.time)
-			.slice(0, maxPoints);
+			.slice(0, maxPoints)
+			.sort((a, b) => a.time - b.time);
+
+		if (!recent.length) return;
 
 		const innerW = containerW - margin.left - margin.right;
 		const innerH = containerH - margin.top - margin.bottom;
@@ -74,7 +77,7 @@
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${innerH})`)
-			.call(d3.axisBottom(x).ticks(5))
+			.call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%m/%d')))
 			.selectAll('text')
 			.style('font-size', '12px')
 			.attr('transform', 'rotate(-45)')

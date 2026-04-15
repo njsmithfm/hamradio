@@ -3,12 +3,15 @@
 	import * as d3 from 'd3';
 
 	export let data = [];
+	export let xDomainStart = null;
+	export let xDomainEnd = null;
 	let chartContainer;
 	let tooltip;
 
 	const margin = { top: 20, right: 20, bottom: 50, left: 50 };
 	const visibleR = 6;
 	const hoverBuffer = 3;
+	const maxPoints = 30;
 
 	const color = d3.scaleLinear().domain([0, 5, 9]).range(['#a1d76a', '#e9a3c9', '#ff0000']);
 
@@ -29,16 +32,31 @@
 	$: if (data?.length && containerW && containerH) drawChart();
 
 	function drawChart() {
+		const domainStart = xDomainStart ? new Date(xDomainStart) : null;
+		const domainEnd = xDomainEnd ? new Date(xDomainEnd) : null;
+		const hasFixedDomain =
+			domainStart && domainEnd && !isNaN(domainStart.getTime()) && !isNaN(domainEnd.getTime());
+
 		const recent = data
-			.slice(1) // Skip header/first row
+			.slice(1)
 			.map((row) => {
-				// Your data uses 'time_tag' for time and 'Kp' for the value
+				if (Array.isArray(row)) {
+					return {
+						time: new Date(row[0]),
+						value: parseFloat(row[1])
+					};
+				}
+
 				return {
 					time: new Date(row.time_tag),
-					value: parseFloat(row.Kp)
+					value: parseFloat(row.Kp ?? row.kp_index)
 				};
 			})
-			.filter((d) => !isNaN(d.value) && !isNaN(d.time.getTime()));
+			.filter((d) => !isNaN(d.value) && !isNaN(d.time.getTime()) && d.time <= new Date())
+			.filter((d) => (hasFixedDomain ? d.time >= domainStart && d.time <= domainEnd : true))
+			.sort((a, b) => b.time - a.time)
+			.slice(0, maxPoints)
+			.sort((a, b) => a.time - b.time);
 		if (!recent.length) return;
 
 		const innerW = containerW - margin.left - margin.right;
@@ -57,7 +75,7 @@
 
 		const x = d3
 			.scaleTime()
-			.domain(d3.extent(recent, (d) => d.time))
+			.domain(hasFixedDomain ? [domainStart, domainEnd] : d3.extent(recent, (d) => d.time))
 			.range([0, innerW]);
 		const y = d3.scaleLinear().domain([0, 9]).range([innerH, 0]);
 
@@ -65,9 +83,9 @@
 		svg
 			.append('g')
 			.attr('transform', `translate(0,${innerH})`)
-			.call(d3.axisBottom(x).ticks(8).tickFormat(d3.timeFormat('%m/%d')))
+			.call(d3.axisBottom(x).ticks(5).tickFormat(d3.timeFormat('%m/%d')))
 			.selectAll('text')
-			.style('font-size', '10px')
+			.style('font-size', '12px')
 			.attr('transform', 'rotate(-45)')
 			.style('text-anchor', 'end');
 
