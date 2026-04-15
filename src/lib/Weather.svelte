@@ -3,6 +3,7 @@
 
 	export let lat = 44.0121; // Rochester, MN
 	export let lon = -92.4802;
+	export let onImpactChange = () => {};
 
 	let weather = null;
 	let forecast = null;
@@ -28,6 +29,16 @@
 				tempC: fToC(cur.temperature) // ← Celsius version
 			};
 
+			const weatherIsFavorable =
+				!(
+					weather.shortForecast.toLowerCase().includes('storm') ||
+					weather.shortForecast.toLowerCase().includes('thunder') ||
+					weather.windSpeed.includes('30') ||
+					weather.windSpeed.includes('40')
+				);
+
+			onImpactChange(weatherIsFavorable ? 'Weather conditions favorable' : 'Conditions are not favorable');
+
 			// next three periods
 			forecast = forecastData.properties.periods.slice(0, 3).map((p) => ({
 				...p,
@@ -35,6 +46,7 @@
 			}));
 		} catch (error) {
 			console.error('Error fetching weather:', error);
+			onImpactChange('Conditions are not favorable');
 		} finally {
 			loading = false;
 		}

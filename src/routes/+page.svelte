@@ -14,7 +14,8 @@
 	let currentKIndex = 0;
 	let currentSolarFlux = 0;
 	let loading = true;
-	let outcome = 'FAVORABLE';
+	let hamRadioConditionsFavorable = false;
+	let hamRadioImpact = 'Loading weather impact...';
 	let activeTab = 0;
 
 	let quote = randomQuote();
@@ -40,16 +41,36 @@
 		playBeep(audio2);
 	}
 
+	function handleImpactChange(impact) {
+		hamRadioImpact = impact;
+		hamRadioConditionsFavorable = impact === 'Weather conditions favorable';
+	}
+
 	onMount(async () => {
 		try {
 			// Order matters – the array indices must line‑up with the variables
-			const [
-				kRes, // planetary_k_index_1m.json
-				fRes // f107_cm_flux.json
-			] = await Promise.all([
+			const [kRes, fRes] = await Promise.all([
 				fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
+
+			const pointResponse = await fetch('https://api.weather.gov/points/44.0121,-92.4802');
+			const pointData = await pointResponse.json();
+			const forecastResponse = await fetch(pointData.properties.forecast);
+			const forecastData = await forecastResponse.json();
+			const currentWeather = forecastData.properties.periods[0];
+			const weatherConditionsFavorable =
+				!(
+					currentWeather.shortForecast.toLowerCase().includes('storm') ||
+					currentWeather.shortForecast.toLowerCase().includes('thunder') ||
+					currentWeather.windSpeed.includes('30') ||
+					currentWeather.windSpeed.includes('40')
+				);
+
+			hamRadioConditionsFavorable = weatherConditionsFavorable;
+			hamRadioImpact = weatherConditionsFavorable
+				? 'Weather conditions favorable'
+				: 'Conditions are not favorable';
 
 			// Parse each response
 			kIndexData = await kRes.json();
@@ -60,6 +81,8 @@
 			currentSolarFlux = solarFluxData.at(-1).flux;
 		} catch (e) {
 			console.error('Failed to load space‑weather data:', e);
+			hamRadioConditionsFavorable = false;
+			hamRadioImpact = 'Conditions are not favorable';
 		} finally {
 			loading = false;
 		}
@@ -168,13 +191,18 @@
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
-										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
-										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
+										PLANETARY IONOSPHERIC QUANTA PERMIT PROPOGATION.
+										{#if hamRadioConditionsFavorable}<strong>QAPLA!</strong>{:else}<strong
+												>Conditions are not favorable.</strong
+											>{/if}
 									</h2>
 									<div class="card wide">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
 									<div class="card">
+										<h4>
+											Radio Impact: {hamRadioImpact}
+										</h4>
 										<h4>
 											K‑Index: {currentKIndex},
 											{#if currentKIndex <= 3}
@@ -207,15 +235,17 @@
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
-										PLANETARY IONOSPHERIC QUANTA PERMIT {outcome} PROPOGATION.
-										{#if outcome == 'FAVORABLE'}<strong>QAPLA!</strong>{/if}
+										PLANETARY IONOSPHERIC QUANTA PERMIT PROPOGATION.
+										{#if hamRadioConditionsFavorable}<strong>QAPLA!</strong>{:else}<strong
+												>Conditions are not favorable.</strong
+											>{/if}
 									</h2>
 
 									<div class="card wide">
 										<Map />
 									</div>
 									<div class="card wide">
-										<Weather />
+										<Weather onImpactChange={handleImpactChange} />
 									</div>
 								</div>
 							</div>
