@@ -325,6 +325,39 @@
 		align-items: flex-start;
 	}
 
+	.tab-bar {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	@media (max-width: 768px) {
+		.nav-row {
+			margin: 0.5rem;
+			gap: 0.5rem;
+		}
+
+		.tab-bar {
+			width: 100%;
+			gap: 0.25rem;
+		}
+
+		.tab-bar button {
+			flex: 1;
+			min-width: auto;
+			padding: 0.6rem 0.8rem;
+			font-size: 0.9rem;
+			min-height: 44px;
+		}
+	}
+
+	@media (max-width: 525px) {
+		.tab-bar button {
+			padding: 0.5rem 0.6rem;
+			font-size: 0.85rem;
+		}
+	}
+
 	.njsmithfm:hover {
 		color: rgb(255, 0, 212);
 	}
@@ -343,6 +376,14 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		max-width: 100%;
+		word-wrap: break-word;
+		hyphens: auto;
+	}
+
+	@media (max-width: 768px) {
+		.quote {
+			font-size: 0.75rem;
+		}
 	}
 
 	.dashboard-grid {
@@ -351,10 +392,49 @@
 		gap: 1rem;
 	}
 
+	@media (max-width: 768px) {
+		.dashboard-grid {
+			gap: 0.5rem;
+		}
+	}
+
 	.card {
 		background: rgba(0, 0, 0, 0.3);
 		padding: 1.5rem;
 		border-radius: 8px;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	@media (max-width: 768px) {
+		.card {
+			padding: 1rem;
+			margin: 0.5rem;
+		}
+
+		.card h2 {
+			font-size: 1.2rem;
+			line-height: 1.3;
+		}
+
+		.card h4 {
+			font-size: 1rem;
+		}
+	}
+
+	@media (max-width: 525px) {
+		.card {
+			padding: 0.75rem;
+			margin: 0.25rem;
+		}
+
+		.card h2 {
+			font-size: 1rem;
+		}
+
+		.card h4 {
+			font-size: 0.9rem;
+		}
 	}
 
 	.card.wide {

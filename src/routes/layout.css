@@ -23,3 +23,45 @@
 	margin-inline: 0;
 	flex: 1 1 auto;
 }
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+	:global(html) {
+		font-size: 1rem;
+	}
+
+	:global(body) {
+		width: 100%;
+	}
+
+	:global(.wrap) {
+		flex-direction: column;
+		padding: 0;
+	}
+
+	:global(#column-1) {
+		margin-left: -999px !important;
+		display: none;
+	}
+
+	:global(#column-2) {
+		width: 0 !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		display: none;
+	}
+
+	:global(#column-3) {
+		padding: 0.5rem;
+	}
+}
+
+@media (max-width: 525px) {
+	:global(html) {
+		font-size: 0.9rem;
+	}
+
+	:global(body) {
+		width: 100%;
+	}
+}

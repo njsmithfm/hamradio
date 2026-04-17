@@ -29,15 +29,16 @@
 				tempC: fToC(cur.temperature) // ← Celsius version
 			};
 
-			const weatherIsFavorable =
-				!(
-					weather.shortForecast.toLowerCase().includes('storm') ||
-					weather.shortForecast.toLowerCase().includes('thunder') ||
-					weather.windSpeed.includes('30') ||
-					weather.windSpeed.includes('40')
-				);
+			const weatherIsFavorable = !(
+				weather.shortForecast.toLowerCase().includes('storm') ||
+				weather.shortForecast.toLowerCase().includes('thunder') ||
+				weather.windSpeed.includes('30') ||
+				weather.windSpeed.includes('40')
+			);
 
-			onImpactChange(weatherIsFavorable ? 'Weather conditions favorable' : 'Conditions are not favorable');
+			onImpactChange(
+				weatherIsFavorable ? 'Weather conditions favorable' : 'Conditions are not favorable'
+			);
 
 			// next three periods
 			forecast = forecastData.properties.periods.slice(0, 3).map((p) => ({
@@ -138,6 +139,8 @@
 
 	.period {
 		border-radius: 4px;
+		padding: 0.5rem 0;
+		word-wrap: break-word;
 	}
 
 	/* two‑column layout below the hero */
@@ -145,5 +148,81 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 1rem;
+	}
+
+	/* Mobile responsiveness */
+	@media (max-width: 768px) {
+		.weather-container {
+			padding: 0.75rem;
+		}
+
+		.weather-main {
+			flex-direction: column;
+			gap: 1rem;
+			align-items: flex-start;
+		}
+
+		.temp {
+			font-size: 2rem;
+		}
+
+		.conditions {
+			font-size: 1rem;
+			word-wrap: break-word;
+		}
+
+		.ham-impact {
+			padding: 0.75rem;
+			margin-top: 0.75rem;
+			font-size: 0.9rem;
+		}
+
+		.panels {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+		}
+
+		.forecast-panel h3,
+		.current-panel h3 {
+			margin-top: 0;
+			margin-bottom: 0.5rem;
+			font-size: 1.1rem;
+		}
+
+		.period {
+			padding: 0.4rem 0;
+			font-size: 0.9rem;
+		}
+	}
+
+	@media (max-width: 525px) {
+		.weather-container {
+			padding: 0.5rem;
+		}
+
+		.temp {
+			font-size: 1.8rem;
+		}
+
+		.conditions {
+			font-size: 0.9rem;
+		}
+
+		.ham-impact {
+			padding: 0.5rem;
+			margin-top: 0.5rem;
+			font-size: 0.85rem;
+		}
+
+		.period {
+			padding: 0.3rem 0;
+			font-size: 0.85rem;
+		}
+
+		.forecast-panel h3,
+		.current-panel h3 {
+			font-size: 1rem;
+			margin-bottom: 0.25rem;
+		}
 	}
 </style>
