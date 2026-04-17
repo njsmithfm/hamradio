@@ -19,6 +19,7 @@
 	let chartEndTime;
 	let chartStartTime;
 	let activeTab = 0;
+	let weatherIsFavorable = false;
 
 	let quote = randomQuote();
 	let stardate = toStardate();
@@ -44,9 +45,25 @@
 	}
 
 	function handleImpactChange(impact) {
-		hamRadioImpact = impact;
-		hamRadioConditionsFavorable = impact === 'Weather conditions favorable';
+		weatherIsFavorable = impact === 'Weather conditions favorable';
 	}
+
+	// Combined conditions: both space weather AND local weather must be favorable
+	$: spaceWeatherFavorable = currentKIndex <= 3 && currentSolarFlux > 100;
+	$: hamRadioConditionsFavorable = spaceWeatherFavorable && weatherIsFavorable;
+	$: degradationReason = (() => {
+		if (!spaceWeatherFavorable && !weatherIsFavorable) {
+			return 'SOLAR INTERFERENCE AND POOR EARTH WEATHER';
+		} else if (!spaceWeatherFavorable) {
+			return 'SOLAR INTERFERENCE';
+		} else if (!weatherIsFavorable) {
+			return 'POOR EARTH WEATHER';
+		}
+		return '';
+	})();
+	$: hamRadioImpact = hamRadioConditionsFavorable
+		? 'Radio propagation favorable'
+		: `Conditions are not favorable for radio propagation (${degradationReason})`;
 
 	onMount(async () => {
 		try {
@@ -61,15 +78,14 @@
 			const forecastResponse = await fetch(pointData.properties.forecast);
 			const forecastData = await forecastResponse.json();
 			const currentWeather = forecastData.properties.periods[0];
-			const weatherConditionsFavorable =
-				!(
-					currentWeather.shortForecast.toLowerCase().includes('storm') ||
-					currentWeather.shortForecast.toLowerCase().includes('thunder') ||
-					currentWeather.windSpeed.includes('30') ||
-					currentWeather.windSpeed.includes('40')
-				);
+			const weatherConditionsFavorable = !(
+				currentWeather.shortForecast.toLowerCase().includes('storm') ||
+				currentWeather.shortForecast.toLowerCase().includes('thunder') ||
+				currentWeather.windSpeed.includes('30') ||
+				currentWeather.windSpeed.includes('40')
+			);
 
-			hamRadioConditionsFavorable = weatherConditionsFavorable;
+			// Store weather info but don't use it for ham radio propagation conditions
 			hamRadioImpact = weatherConditionsFavorable
 				? 'Weather conditions favorable'
 				: 'Conditions are not favorable';
@@ -81,12 +97,24 @@
 			chartStartTime = new Date(chartEndTime.getTime() - 72 * 60 * 60 * 1000);
 
 			// Pull the latest values (optional, for the dashboard cards)
-			currentKIndex = kIndexData.at(-1)[1];
-			currentSolarFlux = solarFluxData.at(-1).flux;
+			try {
+				const kValue = parseFloat(kIndexData.at(-1)?.[1]);
+				currentKIndex = isNaN(kValue) ? 0 : kValue;
+			} catch (err) {
+				console.error('Failed to parse K-index:', err);
+				currentKIndex = 0;
+			}
+			try {
+				const fValue = parseFloat(solarFluxData.at(-1)?.flux);
+				currentSolarFlux = isNaN(fValue) ? 0 : fValue;
+			} catch (err) {
+				console.error('Failed to parse solar flux:', err);
+				currentSolarFlux = 0;
+			}
+			// Reactive declarations will automatically update hamRadioConditionsFavorable
+			// based on both space weather and local weather conditions
 		} catch (e) {
 			console.error('Failed to load space‑weather data:', e);
-			hamRadioConditionsFavorable = false;
-			hamRadioImpact = 'Conditions are not favorable';
 			chartEndTime = new Date();
 			chartStartTime = new Date(chartEndTime.getTime() - 72 * 60 * 60 * 1000);
 		} finally {
@@ -197,10 +225,13 @@
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
-										PLANETARY IONOSPHERIC QUANTA PERMIT PROPOGATION.
-										{#if hamRadioConditionsFavorable}<strong>QAPLA!</strong>{:else}<strong
-												>Conditions are not favorable.</strong
-											>{/if}
+										{#if hamRadioConditionsFavorable}
+											PLANETARY IONOSPHERIC QUANTA PERMIT <strong>FAVORABLE</strong> PROPOGATION.
+											<strong>QAPLA!</strong>
+										{:else}
+											PLANETARY IONOSPHERIC QUANTA PERMIT <strong>UNFAVORABLE</strong> PROPOGATION.
+											<strong>CONDITIONS DEGRADED DUE TO {degradationReason}.</strong>
+										{/if}
 									</h2>
 									<div class="card wide">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
@@ -254,10 +285,13 @@
 							<div class="dashboard-grid">
 								<div class="card">
 									<h2>
-										PLANETARY IONOSPHERIC QUANTA PERMIT PROPOGATION.
-										{#if hamRadioConditionsFavorable}<strong>QAPLA!</strong>{:else}<strong
-												>Conditions are not favorable.</strong
-											>{/if}
+										{#if hamRadioConditionsFavorable}
+											PLANETARY IONOSPHERIC QUANTA PERMIT <strong>FAVORABLE</strong> PROPOGATION.
+											<strong>QAPLA!</strong>
+										{:else}
+											PLANETARY IONOSPHERIC QUANTA PERMIT <strong>UNFAVORABLE</strong> PROPOGATION.
+											<strong>CONDITIONS DEGRADED DUE TO {degradationReason}.</strong>
+										{/if}
 									</h2>
 
 									<div class="card wide">
