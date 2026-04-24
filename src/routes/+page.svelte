@@ -85,6 +85,9 @@
 				currentWeather.windSpeed.includes('40')
 			);
 
+			// Set weather favorability based on fetched data
+			weatherIsFavorable = weatherConditionsFavorable;
+
 			// Store weather info but don't use it for ham radio propagation conditions
 			hamRadioImpact = weatherConditionsFavorable
 				? 'Weather conditions favorable'
