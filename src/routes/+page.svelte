@@ -299,8 +299,11 @@
 					</div>
 					<div>
 						<div class="panel-10">
-							<span class="hop"
-								><a class="njsmithfm" href="https://njsmithfm.github.io" target="_blank"
+							<div class="desktop-nj">
+								<a class="njsmithfm" href="https://njsmithfm.github.io" target="_blank">nj.fm</a>
+							</div>
+							<span class="hop">
+								<a class="njsmithfm" href="https://njsmithfm.github.io" target="_blank"
 									>njsmith.fm</a
 								></span
 							>
@@ -450,6 +453,9 @@
 		gap: 0.5rem;
 		flex-wrap: wrap;
 	}
+	.desktop-nj {
+		display: none;
+	}
 
 	@media (max-width: 768px) {
 		.nav-row {
@@ -476,28 +482,31 @@
 			padding: 0.5rem 0.6rem;
 			font-size: 0.85rem;
 		}
-	}
+		.desktop-nj {
+			display: contents;
+		}
 
-	.njsmithfm:hover {
-		color: rgb(255, 0, 212);
-	}
+		.njsmithfm:hover {
+			color: rgb(255, 0, 212);
+		}
 
-	.title-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.2rem; /* space between heading and quote */
-	}
+		.title-wrapper {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.2rem; /* space between heading and quote */
+		}
 
-	.quote {
-		margin: 0;
-		font-size: 0.85rem;
-		color: #89f;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		max-width: 100%;
-		word-wrap: break-word;
-		hyphens: auto;
+		.quote {
+			margin: 0;
+			font-size: 0.85rem;
+			color: #89f;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			max-width: 100%;
+			word-wrap: break-word;
+			hyphens: auto;
+		}
 	}
 
 	@media (max-width: 768px) {
