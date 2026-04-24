@@ -581,13 +581,6 @@
 		gap: 1rem;
 	}
 
-	@media (min-width: 980px) {
-		.charts-grid {
-			grid-template-columns: 1fr 1fr;
-			align-items: stretch;
-		}
-	}
-
 	.zip-input-container {
 		display: flex;
 		gap: 0.75rem;
@@ -676,6 +669,19 @@
 		.zip-input,
 		.zip-button {
 			flex: 1;
+		}
+
+		.dashboard-grid > .card {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.charts-grid {
+			order: 1;
+		}
+
+		.dashboard-grid > .card > .card.wide {
+			order: 2;
 		}
 	}
 </style>
