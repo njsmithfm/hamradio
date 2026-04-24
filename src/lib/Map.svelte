@@ -5,7 +5,9 @@
 	let mapDiv; // bound to the <div> that becomes the map
 	let L; // Leaflet namespace
 
-	const BASE_URL = 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}';
+	const BASE_URL_LIGHT = 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}';
+	const BASE_URL_DARK =
+		'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}';
 	const BASE_ATTRIB =
 		'&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> ' +
 		'&copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> ' +
@@ -38,7 +40,14 @@
 			return;
 		}
 
-		const baseLayer = L.tileLayer(BASE_URL, {
+		const baseLayerLight = L.tileLayer(BASE_URL_LIGHT, {
+			minZoom: 0,
+			maxZoom: 20,
+			attribution: BASE_ATTRIB,
+			ext: 'png'
+		});
+
+		const baseLayerDark = L.tileLayer(BASE_URL_DARK, {
 			minZoom: 0,
 			maxZoom: 20,
 			attribution: BASE_ATTRIB,
@@ -57,12 +66,26 @@
 		const map = L.map(mapDiv, {
 			center: [44.0121, -92.4802],
 			zoom: 8, // Good view of Rochester area
-			layers: [baseLayer, radarLayer]
+			layers: [baseLayerDark, radarLayer]
 		});
 
 		const overlays = {
-			'Weather Radar': radarLayer
+			'Weather Radar': radarLayer,
+			'Light Mode': baseLayerLight
 		};
+
+		// Dark mode toggle handler
+		map.on('overlayadd', (e) => {
+			if (e.name === 'Light Mode') {
+				map.removeLayer(baseLayerDark);
+			}
+		});
+
+		map.on('overlayremove', (e) => {
+			if (e.name === 'Light Mode') {
+				map.addLayer(baseLayerDark);
+			}
+		});
 
 		L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 	});
