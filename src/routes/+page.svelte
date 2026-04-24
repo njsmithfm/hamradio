@@ -328,7 +328,7 @@
 											<strong>CONDITIONS DEGRADED DUE TO {degradationReason}.</strong>
 										{/if}
 									</h2>
-									<div class="card" style="margin-bottom: -0.5rem;">
+									<div class="card" style="margin:0; padding: 0">
 										<h4>
 											Radio Impact: {hamRadioImpact}
 										</h4>
@@ -358,7 +358,7 @@
 											<span class="location-error">{locationError}</span>
 										{/if}
 									</div>
-									<div class="card wide" style="margin-bottom: 0;">
+									<div class="card wide" style="margin-bottom: 0; padding: 0">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
 
@@ -584,16 +584,16 @@
 		gap: 0.75rem;
 		align-items: center;
 		flex-wrap: wrap;
-		margin: 0.1rem 0;
 	}
 
 	.zip-input-container p {
+		color: #89f;
 		margin: 0;
 		flex: 0 0 auto;
 	}
 
 	.zip-input {
-		padding: 0.6rem 0.8rem;
+		padding: 0.2rem 0.8rem;
 		font-family: monospace;
 		font-size: 0.9rem;
 		background-color: rgba(0, 0, 0, 0.3);
@@ -601,7 +601,7 @@
 		border: 2px solid var(--african-violet);
 		border-radius: 4px;
 		min-height: 44px;
-		min-width: 120px;
+		min-width: 60px;
 	}
 
 	.zip-input:focus {
@@ -621,8 +621,8 @@
 	}
 
 	.zip-button {
-		padding: 0.6rem 1.2rem;
-		background-color: var(--african-violet);
+		padding: 0.2rem 1rem;
+		background-color: #c59;
 		color: #fff;
 		border: 2px solid var(--african-violet);
 		border-radius: 4px;
