@@ -24,7 +24,7 @@
 	// Location-based state
 	let latitude = 44.0121;
 	let longitude = -92.4802;
-	let locationName = 'ROCHESTER MN';
+	let locationName = 'ROCHESTER, MN';
 	let zipCode = '55901';
 	let updatingLocation = false;
 	let locationError = '';
