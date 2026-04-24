@@ -45,37 +45,35 @@
 	}
 </script>
 
-<div class="bands-container">
-	<div class="bands-titles">
-		<h4>HF Band Conditions ({solarFlux.toFixed(0)} SFU and {kIndex} K-Index)</h4>
-	</div>
+<div class="bands-titles">
+	<h4>HF Band Conditions ({solarFlux.toFixed(0)} SFU and {kIndex} K-Index)</h4>
+</div>
 
-	<div class="bands-grid">
-		{#each bands as band}
-			{@const condition = getCondition(band)}
-			<div class="band-card" style="border-left-color: {getConditionColor(condition)}">
-				<div class="band-name">{band.name}</div>
-				<div class="band-freq">{band.freq}</div>
-				<div class="band-condition" style="color: {getConditionColor(condition)}">
-					{condition.toUpperCase()}
-				</div>
-				<div class="band-time">
-					{#if band.dayBand}
-						Best daytime
-					{:else if band.nightBand}
-						Best nighttime
-					{:else}
-						Good 24/7
-					{/if}
-				</div>
+<div class="bands-grid">
+	{#each bands as band}
+		{@const condition = getCondition(band)}
+		<div class="band-card" style="border-left-color: {getConditionColor(condition)}">
+			<div class="band-name">{band.name}</div>
+			<div class="band-freq">{band.freq}</div>
+			<div class="band-condition" style="color: {getConditionColor(condition)}">
+				{condition.toUpperCase()}
 			</div>
-		{/each}
-	</div>
+			<div class="band-time">
+				{#if band.dayBand}
+					Best daytime
+				{:else if band.nightBand}
+					Best nighttime
+				{:else}
+					Good 24/7
+				{/if}
+			</div>
+		</div>
+	{/each}
 </div>
 
 <style>
-	.bands-container {
-		padding: 1rem;
+	.bands-titles {
+		margin: 0rem;
 	}
 
 	.bands-grid {

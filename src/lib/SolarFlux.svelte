@@ -163,8 +163,16 @@
 	}
 </script>
 
-<div class="chart-wrapper" bind:this={chartContainer}>
-	<div class="tooltip" bind:this={tooltip}></div>
+<div class="chart-container">
+	<p class="chart-subtitle">
+		3 daily readings at 17:00, 20:00, and 22:00 (<a
+			href="https://www.swpc.noaa.gov/phenomena/f107-cm-radio-emissions"
+			target="_blank">NOAA F10.7cm Flux</a
+		>)
+	</p>
+	<div class="chart-wrapper" bind:this={chartContainer}>
+		<div class="tooltip" bind:this={tooltip}></div>
+	</div>
 </div>
 
 <style>
@@ -180,6 +188,18 @@
 		width: 100%;
 		height: 100%;
 		display: block;
+	}
+
+	.chart-container {
+		position: relative;
+		width: 100%;
+	}
+
+	.chart-subtitle {
+		margin: 0;
+		font-size: 0.875rem;
+		color: #fba;
+		font-weight: 400;
 	}
 
 	.tooltip {

@@ -1775,7 +1775,7 @@ nav button:nth-child(4) {
 	display: flex;
 	align-items: flex-end;
 	justify-content: flex-end;
-	height: 22vh;
+	height: 12vh;
 	max-height: 300px;
 	background-color: var(--panel-4-color); 
 }
@@ -1790,33 +1790,35 @@ nav button:nth-child(4) {
 }
 
 .panel-6	{
-	height: 29vh;
+	height: 13vh;
 	max-height: 360px;
 	background-color: var(--panel-6-color);
 }
 
 .panel-7	{
-	height: 27vh;
+	height: 17vh;
 	max-height: 350px;
 	background-color: var(--panel-7-color);
 }
 
 .panel-8	{
-	height: 15vh;
+	height: 10vh;
 	background-color: var(--panel-8-color);
 }
 
 /* Note: panel-9 height is fluid and governed by the amount of content on the page. Background color is inherited from :root --left-frame-color */
 
 .panel-9	{
-	min-height: 27vh;
+	height: 07vh;
 	padding: var(--left-frame-padding);
 }
 
 .panel-10 {
-	height: 30vh;
+	height: 15vh;
 	border-top: var(--panel-border);
 	background-color: var(--panel-10-color);
+	position: sticky;
+	bottom: 5;
 }
 
 @media (max-width: 525px) {

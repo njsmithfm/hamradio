@@ -204,6 +204,7 @@
 						<div class="panel-6">16<span class="hop">-071984</span></div>
 						<div class="panel-7">23<span class="hop">-081940</span></div>
 						<div class="panel-8">42<span class="hop">-47148</span></div>
+						<div class="panel-9">13<span class="hop">-12Z07</span></div>
 					</div>
 					<div>
 						<div class="panel-10">
@@ -236,18 +237,18 @@
 											<strong>CONDITIONS DEGRADED DUE TO {degradationReason}.</strong>
 										{/if}
 									</h2>
-									<div class="card wide">
-										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
-									</div>
-									<div class="card">
+									<div class="card" style="margin-bottom: -0.5rem;">
 										<h4>
 											Radio Impact: {hamRadioImpact}
 										</h4>
 									</div>
+									<div class="card wide" style="margin-bottom: 0;">
+										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
+									</div>
 
 									<div class="charts-grid">
 										<div class="card">
-											<h4>
+											<h4 style="margin-top: 1rem; font-weight: 600;">
 												K‑Index: {currentKIndex},
 												{#if currentKIndex <= 3}
 													Quiet
@@ -265,7 +266,7 @@
 										</div>
 
 										<div class="card">
-											<h4>
+											<h4 style="margin-top: 1rem; font-weight: 600;">
 												Solar Flux Units: {currentSolarFlux.toFixed(0)},
 												{#if currentSolarFlux > 150}
 													Optimal
@@ -403,7 +404,7 @@
 
 	.card {
 		background: rgba(0, 0, 0, 0.3);
-		padding: 1.5rem;
+		padding: 0.5rem;
 		border-radius: 8px;
 		word-break: break-word;
 		overflow-wrap: break-word;
