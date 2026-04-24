@@ -11,7 +11,7 @@
 	const hoverBuffer = 3;
 	const maxPoints = 30;
 
-	const color = d3.scaleLinear().domain([50, 100, 150]).range(['#ff0000', '#ffff00', '#00ff00']);
+	const color = d3.scaleLinear().domain([50, 100, 150]).range(['#cc7a7a', '#d9d77a', '#a1d76a']);
 
 	let containerW = 0;
 	let containerH = 0;
@@ -116,7 +116,7 @@
 			.attr('cx', (d) => x(d.time))
 			.attr('cy', (d) => y(d.flux))
 			.attr('r', visibleR)
-			.attr('fill', '#2563eb')
+			.attr('fill', (d) => color(d.flux))
 			.attr('stroke', '#1e40af')
 			.attr('stroke-width', 1);
 
@@ -136,7 +136,7 @@
 			.on('mouseover', (_, d) => {
 				tooltip.innerHTML = `
       <strong>${d3.timeFormat('%b %d %H:%M')(d.time)}</strong><br/>
-      SFU: <span style="color:#2563eb">${d.flux.toFixed(1)}</span>`;
+      SFU: <span style="color:${color(d.flux)}">${d.flux.toFixed(1)}</span>`;
 				tooltip.style.opacity = 1; // make it visible so we can measure it
 
 				const cx = x(d.time);
