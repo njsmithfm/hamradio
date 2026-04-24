@@ -664,6 +664,7 @@
 		.zip-input-container p {
 			min-width: 100%;
 			margin-bottom: 0.5rem;
+			flex: 1 1 100%;
 		}
 
 		.zip-input,
