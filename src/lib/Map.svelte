@@ -2,8 +2,12 @@
 	import { onMount } from 'svelte';
 	import 'leaflet/dist/leaflet.css';
 
+	export let latitude = 44.0121;
+	export let longitude = -92.4802;
+
 	let mapDiv; // bound to the <div> that becomes the map
 	let L; // Leaflet namespace
+	let map;
 
 	const BASE_URL_LIGHT = 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.{ext}';
 	const BASE_URL_DARK =
@@ -63,9 +67,9 @@
 			}
 		);
 
-		const map = L.map(mapDiv, {
-			center: [44.0121, -92.4802],
-			zoom: 8, // Good view of Rochester area
+		map = L.map(mapDiv, {
+			center: [latitude, longitude],
+			zoom: 8,
 			layers: [baseLayerDark, radarLayer]
 		});
 
@@ -89,6 +93,11 @@
 
 		L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 	});
+
+	// Update map center when coordinates change
+	$: if (map) {
+		map.setView([latitude, longitude], 8);
+	}
 </script>
 
 <!-- Map container -->

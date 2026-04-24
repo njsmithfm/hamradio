@@ -21,6 +21,14 @@
 	let activeTab = 0;
 	let weatherIsFavorable = false;
 
+	// Location-based state
+	let latitude = 44.0121;
+	let longitude = -92.4802;
+	let locationName = 'ROCHESTER MN';
+	let zipCode = '55901';
+	let updatingLocation = false;
+	let locationError = '';
+
 	let quote = randomQuote();
 	let stardate = toStardate();
 
@@ -48,6 +56,89 @@
 		weatherIsFavorable = impact === 'Weather conditions favorable';
 	}
 
+	// Convert zip code to latitude and longitude
+	async function zipToCoordinates(zip) {
+		try {
+			const url = `https://api.zippopotam.us/us/${zip}`;
+			console.log('Geocoding URL:', url);
+
+			const response = await fetch(url);
+			const data = await response.json();
+
+			console.log('Geocoding response:', data);
+
+			if (data.places.length === 0) {
+				throw new Error('Zip code not found');
+			}
+
+			const match = data.places[0];
+			const lat = parseFloat(match.latitude);
+			const lon = parseFloat(match.longitude);
+			const cityState = `${match['place name']}, ${match['state abbreviation']}`;
+
+			return { lat, lon, cityState };
+		} catch (error) {
+			console.error('Geocoding error:', error);
+			throw new Error(
+				'Unable to find location for this zip code. Please check the zip code and try again.'
+			);
+		}
+	}
+
+	// Fetch weather for a given location
+	async function fetchWeatherForLocation(lat, lon, newLocationName) {
+		try {
+			const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+			const pointData = await pointResponse.json();
+			const forecastResponse = await fetch(pointData.properties.forecast);
+			const forecastData = await forecastResponse.json();
+			const currentWeather = forecastData.properties.periods[0];
+			const weatherConditionsFavorable = !(
+				currentWeather.shortForecast.toLowerCase().includes('storm') ||
+				currentWeather.shortForecast.toLowerCase().includes('thunder') ||
+				currentWeather.windSpeed.includes('30') ||
+				currentWeather.windSpeed.includes('40')
+			);
+
+			weatherIsFavorable = weatherConditionsFavorable;
+			hamRadioImpact = weatherConditionsFavorable
+				? 'Weather conditions favorable'
+				: 'Conditions are not favorable';
+
+			// Update location
+			latitude = lat;
+			longitude = lon;
+			locationName = newLocationName;
+		} catch (error) {
+			console.error('Weather fetch error:', error);
+			throw new Error('Unable to fetch weather for this location');
+		}
+	}
+
+	// Handle "MAKE IT SO" button click
+	async function updateLocation() {
+		locationError = '';
+		updatingLocation = true;
+
+		try {
+			// Validate zip code format
+			if (!/^\d{5}$/.test(zipCode)) {
+				throw new Error('Please enter a valid 5-digit zip code');
+			}
+
+			// Get coordinates from zip code
+			const { lat, lon, cityState } = await zipToCoordinates(zipCode);
+
+			// Fetch weather and update location
+			await fetchWeatherForLocation(lat, lon, cityState.toUpperCase());
+		} catch (error) {
+			locationError = error.message;
+			console.error('Location update error:', error);
+		} finally {
+			updatingLocation = false;
+		}
+	}
+
 	// Combined conditions: both space weather AND local weather must be favorable
 	$: spaceWeatherFavorable = currentKIndex <= 3 && currentSolarFlux > 100;
 	$: hamRadioConditionsFavorable = spaceWeatherFavorable && weatherIsFavorable;
@@ -73,7 +164,7 @@
 				fetch('https://services.swpc.noaa.gov/json/f107_cm_flux.json')
 			]);
 
-			const pointResponse = await fetch('https://api.weather.gov/points/44.0121,-92.4802');
+			const pointResponse = await fetch(`https://api.weather.gov/points/${latitude},${longitude}`);
 			const pointData = await pointResponse.json();
 			const forecastResponse = await fetch(pointData.properties.forecast);
 			const forecastData = await forecastResponse.json();
@@ -176,7 +267,7 @@
 								</button>
 							</nav>
 
-							<div class="banner">ROCHESTER MN</div>
+							<div class="banner">{locationName}</div>
 
 							<div class="title-wrapper">
 								<div style="text-align:left; font-size:1.5rem">LCARS V. 24.2</div>
@@ -242,6 +333,31 @@
 											Radio Impact: {hamRadioImpact}
 										</h4>
 									</div>
+									<div class="zip-input-container">
+										<p>
+											Enter a 5-digit US ZIP code here to see radio propogation and weather for
+											other locations:
+										</p>
+										<input
+											type="text"
+											placeholder="Enter ZIP code"
+											bind:value={zipCode}
+											maxlength="5"
+											pattern="\d{5}"
+											class="zip-input"
+											disabled={updatingLocation}
+										/>
+										<button
+											on:click={updateLocation}
+											disabled={updatingLocation}
+											class="zip-button"
+										>
+											{updatingLocation ? 'LOADING...' : 'MAKE IT SO!'}
+										</button>
+										{#if locationError}
+											<span class="location-error">{locationError}</span>
+										{/if}
+									</div>
 									<div class="card wide" style="margin-bottom: 0;">
 										<Bands solarFlux={currentSolarFlux} kIndex={currentKIndex} />
 									</div>
@@ -299,10 +415,10 @@
 									</h2>
 
 									<div class="card wide">
-										<Map />
+										<Map {latitude} {longitude} />
 									</div>
 									<div class="card wide">
-										<Weather onImpactChange={handleImpactChange} />
+										<Weather lat={latitude} lon={longitude} onImpactChange={handleImpactChange} />
 									</div>
 								</div>
 							</div>
@@ -460,6 +576,97 @@
 		.charts-grid {
 			grid-template-columns: 1fr 1fr;
 			align-items: stretch;
+		}
+	}
+
+	.zip-input-container {
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+		flex-wrap: wrap;
+		margin: 0.1rem 0;
+	}
+
+	.zip-input-container p {
+		margin: 0;
+		flex: 0 0 auto;
+	}
+
+	.zip-input {
+		padding: 0.6rem 0.8rem;
+		font-family: monospace;
+		font-size: 0.9rem;
+		background-color: rgba(0, 0, 0, 0.3);
+		color: #89f;
+		border: 2px solid var(--african-violet);
+		border-radius: 4px;
+		min-height: 44px;
+		min-width: 120px;
+	}
+
+	.zip-input:focus {
+		outline: none;
+		background-color: rgba(0, 0, 0, 0.5);
+		border-color: #fff;
+		box-shadow: 0 0 8px rgba(136, 153, 255, 0.5);
+	}
+
+	.zip-input::placeholder {
+		color: rgba(136, 153, 255, 0.5);
+	}
+
+	.zip-input:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.zip-button {
+		padding: 0.6rem 1.2rem;
+		background-color: var(--african-violet);
+		color: #fff;
+		border: 2px solid var(--african-violet);
+		border-radius: 4px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		white-space: nowrap;
+		min-height: 44px;
+		transition: all 0.2s ease;
+	}
+
+	.zip-button:hover:not(:disabled) {
+		background-color: rgba(136, 153, 255, 0.8);
+		box-shadow: 0 0 12px rgba(136, 153, 255, 0.6);
+	}
+
+	.zip-button:active:not(:disabled) {
+		background-color: rgba(136, 153, 255, 0.6);
+	}
+
+	.zip-button:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.location-error {
+		color: #ff6b6b;
+		font-size: 0.8rem;
+		align-self: center;
+	}
+
+	@media (max-width: 768px) {
+		.zip-input-container {
+			gap: 0.5rem;
+		}
+
+		.zip-input-container p {
+			min-width: 100%;
+			margin-bottom: 0.5rem;
+		}
+
+		.zip-input,
+		.zip-button {
+			flex: 1;
 		}
 	}
 </style>

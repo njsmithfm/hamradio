@@ -13,10 +13,11 @@
 		return Math.round(((f - 32) * 5) / 9);
 	}
 
-	onMount(async () => {
+	async function fetchWeather(latitude, longitude) {
+		loading = true;
 		try {
 			// First, get the grid point data
-			const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+			const pointResponse = await fetch(`https://api.weather.gov/points/${latitude},${longitude}`);
 			const pointData = await pointResponse.json();
 
 			// Then get the forecast
@@ -51,7 +52,16 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	onMount(() => {
+		fetchWeather(lat, lon);
 	});
+
+	// Re-fetch weather when latitude or longitude changes
+	$: if (lat && lon) {
+		fetchWeather(lat, lon);
+	}
 </script>
 
 <div class="weather-container">

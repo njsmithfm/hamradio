@@ -2,7 +2,6 @@ export const quotes = [
 	'Live long and prosper',
 	'Infinite diversity in infinite combinations',
 	'Resistance is futile',
-	'Make it so',
 	'Engage!',
 	'Logic is the beginning of wisdom, not the end',
 	'to be human is to make yourself more than you are',
