@@ -18,14 +18,7 @@
 		'&copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> ' +
 		'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors';
 
-	const OWM_KEY = import.meta.env.VITE_OWM_KEY ?? 'YOUR_OWM_KEY_HERE';
-	const CLOUD_URL = `https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
-	const CLOUD_ATTRIB =
-		'&copy; <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap</a>';
 
-	const WIND_URL = `https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${OWM_KEY}`;
-	const WIND_ATTRIB =
-		'&copy; <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap</a>';
 
 	onMount(async () => {
 		const leaf = await import('leaflet');
@@ -59,18 +52,6 @@
 			}
 		);
 
-		const cloudsLayer = L.tileLayer(CLOUD_URL, {
-			attribution: CLOUD_ATTRIB,
-			opacity: 0.5,
-			maxZoom: 20
-		});
-
-		const windLayer = L.tileLayer(WIND_URL, {
-			attribution: WIND_ATTRIB,
-			opacity: 0.6,
-			maxZoom: 20
-		});
-
 		map = L.map(mapDiv, {
 			center: [latitude, longitude],
 			zoom: 8,
@@ -83,9 +64,7 @@
 		};
 
 		const overlays = {
-			'Weather Radar': radarLayer,
-			Clouds: cloudsLayer,
-			Wind: windLayer
+			'Precipitation': radarLayer
 		};
 
 		// Ensure radar stays on top when base layer changes
